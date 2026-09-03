@@ -1,2086 +1,940 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-
-    <meta
-        name="viewport"
-        content="width=device-width, initial-scale=1.0, viewport-fit=cover"
-    >
-
-    <meta name="theme-color" content="#350D17">
-
-    <title>For You, On Your Birthday</title>
-
-    <link
-        rel="preconnect"
-        href="https://fonts.googleapis.com"
-    >
-
-    <link
-        rel="preconnect"
-        href="https://fonts.gstatic.com"
-        crossorigin
-    >
-
-    <link
-        href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500&family=Jost:wght@300;400;500&display=swap"
-        rel="stylesheet"
-    >
-
-    <style>
-        :root {
-            --wine: #4A1220;
-            --wine-deep: #350D17;
-            --blush: #F3D7DA;
-            --gold: #C9A15A;
-            --gold-soft: #E4C888;
-            --cream: #FBF4EC;
-            --ink: #2B1116;
-            --white: #ffffff;
-        }
-
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-        }
-
-        html,
-        body {
-            width: 100%;
-            height: 100%;
-            overflow: hidden;
-        }
-
-        body {
-            background: var(--wine-deep);
-            color: var(--cream);
-            font-family: "Jost", sans-serif;
-            font-weight: 300;
-            -webkit-font-smoothing: antialiased;
-        }
-
-        button {
-            font: inherit;
-        }
-
-        .app {
-            position: relative;
-            width: 100%;
-            height: 100dvh;
-            overflow: hidden;
-            background:
-                radial-gradient(
-                    circle at 50% 35%,
-                    rgba(201, 161, 90, 0.08),
-                    transparent 35%
-                ),
-                var(--wine-deep);
-        }
-
-        /* =========================================
-           PAGES
-        ========================================= */
-
-        .pages {
-            position: relative;
-            width: 100%;
-            height: 100%;
-        }
-
-        .page {
-            position: absolute;
-            inset: 0;
-            width: 100%;
-            height: 100%;
-
-            display: flex;
-            align-items: center;
-            justify-content: center;
-
-            padding:
-                70px
-                24px
-                80px;
-
-            opacity: 0;
-            visibility: hidden;
-            transform: scale(1.02);
-
-            transition:
-                opacity 0.8s ease,
-                transform 0.8s ease,
-                visibility 0.8s ease;
-
-            overflow: hidden;
-        }
-
-        .page.active {
-            opacity: 1;
-            visibility: visible;
-            transform: scale(1);
-        }
-
-        .page-content {
-            position: relative;
-            z-index: 5;
-            width: min(900px, 100%);
-            max-height: 100%;
-            overflow-y: auto;
-            scrollbar-width: none;
-        }
-
-        .page-content::-webkit-scrollbar {
-            display: none;
-        }
-
-        /* =========================================
-           BACKGROUND
-        ========================================= */
-
-        .background-glow {
-            position: absolute;
-            width: 500px;
-            height: 500px;
-            border-radius: 50%;
-
-            background: radial-gradient(
-                circle,
-                rgba(201, 161, 90, 0.10),
-                transparent 70%
-            );
-
-            pointer-events: none;
-        }
-
-        .glow-one {
-            top: -220px;
-            left: -180px;
-        }
-
-        .glow-two {
-            right: -200px;
-            bottom: -220px;
-        }
-
-        /* =========================================
-           GOLD DUST
-        ========================================= */
-
-        .dust-container {
-            position: absolute;
-            inset: 0;
-            overflow: hidden;
-            pointer-events: none;
-            z-index: 1;
-        }
-
-        .dust {
-            position: absolute;
-            width: 3px;
-            height: 3px;
-            border-radius: 50%;
-            background: var(--gold-soft);
-            opacity: 0;
-
-            animation:
-                dustFloat linear infinite;
-        }
-
-        @keyframes dustFloat {
-            0% {
-                transform:
-                    translate3d(0, 30px, 0)
-                    scale(0.4);
-                opacity: 0;
-            }
-
-            15% {
-                opacity: 0.7;
-            }
-
-            85% {
-                opacity: 0.45;
-            }
-
-            100% {
-                transform:
-                    translate3d(20px, -110vh, 0)
-                    scale(1);
-                opacity: 0;
-            }
-        }
-
-        /* =========================================
-           TYPOGRAPHY
-        ========================================= */
-
-        .eyebrow {
-            text-transform: uppercase;
-            letter-spacing: 0.3em;
-            font-size: 0.68rem;
-            color: var(--gold-soft);
-            margin-bottom: 18px;
-        }
-
-        .serif {
-            font-family: "Cormorant Garamond", serif;
-        }
-
-        /* =========================================
-           HERO
-        ========================================= */
-
-        .hero {
-            text-align: center;
-        }
-
-        .hero-intro {
-            margin-bottom: 28px;
-        }
-
-        .hero-title {
-            font-family: "Cormorant Garamond", serif;
-            font-size: clamp(3rem, 9vw, 6.5rem);
-            font-weight: 400;
-            line-height: 0.9;
-            letter-spacing: -0.03em;
-        }
-
-        .hero-subtitle {
-            margin-top: 18px;
-            color: rgba(251, 244, 236, 0.72);
-            font-size: 0.85rem;
-            letter-spacing: 0.08em;
-        }
-
-        /* =========================================
-           ENVELOPE
-        ========================================= */
-
-        .envelope-wrap {
-            position: relative;
-            width: min(390px, 85vw);
-            height: 270px;
-            margin: 30px auto 0;
-
-            perspective: 1000px;
-
-            cursor: pointer;
-        }
-
-        .envelope {
-            position: absolute;
-            inset: 0;
-
-            transform-style: preserve-3d;
-
-            transition:
-                transform 1s cubic-bezier(.22, .8, .2, 1);
-        }
-
-        .envelope-back {
-            position: absolute;
-            inset: 0;
-
-            background:
-                linear-gradient(
-                    145deg,
-                    #6b2537,
-                    var(--wine)
-                );
-
-            border: 1px solid rgba(201, 161, 90, 0.35);
-
-            border-radius: 4px;
-
-            box-shadow:
-                0 25px 70px rgba(0, 0, 0, 0.35);
-        }
-
-        .envelope-front {
-            position: absolute;
-            inset: 0;
-
-            background: var(--wine);
-
-            clip-path: polygon(
-                0 0,
-                50% 52%,
-                100% 0,
-                100% 100%,
-                0 100%
-            );
-
-            z-index: 3;
-        }
-
-        .envelope-flap {
-            position: absolute;
-            left: 0;
-            top: 0;
-
-            width: 100%;
-            height: 100%;
-
-            background:
-                linear-gradient(
-                    145deg,
-                    #7a2c40,
-                    #521523
-                );
-
-            clip-path: polygon(
-                0 0,
-                100% 0,
-                50% 53%
-            );
-
-            transform-origin: top center;
-
-            z-index: 4;
-
-            transition:
-                transform 0.9s cubic-bezier(.22, .8, .2, 1);
-        }
-
-        .envelope-wrap.open .envelope-flap {
-            transform: rotateX(180deg);
-        }
-
-        .seal {
-            position: absolute;
-
-            left: 50%;
-            top: 52%;
-
-            width: 64px;
-            height: 64px;
-
-            transform: translate(-50%, -50%);
-
-            border-radius: 50%;
-
-            display: flex;
-            align-items: center;
-            justify-content: center;
-
-            background:
-                radial-gradient(
-                    circle at 35% 30%,
-                    #e8cc91,
-                    var(--gold)
-                );
-
-            color: var(--wine-deep);
-
-            font-family: "Cormorant Garamond", serif;
-            font-size: 1.6rem;
-
-            box-shadow:
-                0 7px 20px rgba(0, 0, 0, 0.25);
-
-            z-index: 6;
-
-            transition:
-                opacity 0.3s ease,
-                transform 0.3s ease;
-        }
-
-        .envelope-wrap.open .seal {
-            opacity: 0;
-            transform:
-                translate(-50%, -50%)
-                scale(0.7);
-        }
-
-        .open-label {
-            position: absolute;
-            bottom: -48px;
-            left: 0;
-            right: 0;
-
-            text-align: center;
-
-            color: rgba(251, 244, 236, 0.65);
-
-            font-size: 0.7rem;
-            letter-spacing: 0.18em;
-            text-transform: uppercase;
-        }
-
-        /* =========================================
-           LETTER
-        ========================================= */
-
-        .letter-page {
-            background:
-                radial-gradient(
-                    circle at center,
-                    rgba(201, 161, 90, 0.08),
-                    transparent 55%
-                );
-        }
-
-        .letter-card {
-            position: relative;
-
-            width: min(750px, 100%);
-
-            padding:
-                clamp(30px, 6vw, 70px)
-                clamp(25px, 7vw, 80px);
-
-            background: rgba(251, 244, 236, 0.97);
-            color: var(--ink);
-
-            box-shadow:
-                0 30px 100px rgba(0, 0, 0, 0.35);
-
-            border-radius: 2px;
-        }
-
-        .letter-card::before {
-            content: "";
-            position: absolute;
-            inset: 12px;
-
-            border: 1px solid rgba(201, 161, 90, 0.45);
-
-            pointer-events: none;
-        }
-
-        .letter-heading {
-            position: relative;
-
-            font-family: "Cormorant Garamond", serif;
-
-            font-size: clamp(2.5rem, 7vw, 5rem);
-
-            font-weight: 400;
-
-            line-height: 0.95;
-
-            color: var(--wine);
-
-            margin-bottom: 25px;
-        }
-
-        .letter-body {
-            position: relative;
-
-            font-family: "Cormorant Garamond", serif;
-
-            font-size: clamp(1.15rem, 2vw, 1.45rem);
-
-            line-height: 1.65;
-
-            color: rgba(43, 17, 22, 0.85);
-        }
-
-        .letter-body p {
-            margin-bottom: 18px;
-        }
-
-        .signature {
-            position: relative;
-
-            margin-top: 30px;
-
-            font-family: "Cormorant Garamond", serif;
-            font-style: italic;
-
-            font-size: 1.8rem;
-
-            color: var(--wine);
-        }
-
-        /* =========================================
-           MEMORIES
-        ========================================= */
-
-        .memories-page {
-            background:
-                linear-gradient(
-                    180deg,
-                    var(--wine-deep),
-                    #42111d
-                );
-        }
-
-        .memories-header {
-            text-align: center;
-            margin-bottom: 28px;
-        }
-
-        .memories-title {
-            font-family: "Cormorant Garamond", serif;
-
-            font-size: clamp(2.8rem, 7vw, 5rem);
-
-            font-weight: 400;
-
-            line-height: 1;
-        }
-
-        .memories-subtitle {
-            margin-top: 12px;
-
-            color: rgba(251, 244, 236, 0.65);
-
-            font-size: 0.8rem;
-
-            letter-spacing: 0.08em;
-        }
-
-        .memory-grid {
-            display: grid;
-
-            grid-template-columns:
-                repeat(2, minmax(0, 1fr));
-
-            gap: 18px;
-
-            width: min(700px, 100%);
-
-            margin: 0 auto;
-        }
-
-        .polaroid {
-            position: relative;
-
-            background: #fff;
-
-            padding: 9px 9px 28px;
-
-            cursor: pointer;
-
-            box-shadow:
-                0 15px 35px rgba(0, 0, 0, 0.3);
-
-            transition:
-                transform 0.4s ease,
-                box-shadow 0.4s ease;
-        }
-
-        .polaroid:nth-child(1) {
-            transform: rotate(-2deg);
-        }
-
-        .polaroid:nth-child(2) {
-            transform: rotate(2deg);
-        }
-
-        .polaroid:nth-child(3) {
-            transform: rotate(1.5deg);
-        }
-
-        .polaroid:nth-child(4) {
-            transform: rotate(-2.5deg);
-        }
-
-        .polaroid:hover {
-            transform:
-                translateY(-8px)
-                rotate(0deg)
-                scale(1.02);
-
-            box-shadow:
-                0 25px 50px rgba(0, 0, 0, 0.4);
-
-            z-index: 5;
-        }
-
-        .polaroid img {
-            display: block;
-
-            width: 100%;
-            aspect-ratio: 1 / 1;
-
-            object-fit: cover;
-
-            background: #eee;
-        }
-
-        .polaroid-caption {
-            position: absolute;
-
-            left: 0;
-            right: 0;
-            bottom: 7px;
-
-            text-align: center;
-
-            font-family: "Cormorant Garamond", serif;
-
-            font-size: 1rem;
-
-            color: var(--ink);
-        }
-
-        /* =========================================
-           CLOSING
-        ========================================= */
-
-        .closing {
-            text-align: center;
-        }
-
-        .closing-title {
-            font-family: "Cormorant Garamond", serif;
-
-            font-size: clamp(3.5rem, 11vw, 8rem);
-
-            font-weight: 400;
-
-            line-height: 0.85;
-
-            color: var(--cream);
-        }
-
-        .closing-message {
-            max-width: 620px;
-
-            margin: 25px auto 0;
-
-            font-family: "Cormorant Garamond", serif;
-
-            font-size: clamp(1.2rem, 3vw, 1.6rem);
-
-            line-height: 1.55;
-
-            color: rgba(251, 244, 236, 0.78);
-        }
-
-        .heart {
-            position: relative;
-
-            display: inline-flex;
-
-            margin-top: 35px;
-
-            font-size: 2.2rem;
-
-            color: var(--gold-soft);
-
-            animation:
-                heartbeat 1.5s ease-in-out infinite;
-        }
-
-        @keyframes heartbeat {
-            0%,
-            100% {
-                transform: scale(1);
-            }
-
-            50% {
-                transform: scale(1.15);
-            }
-        }
-
-        /* =========================================
-           BUTTONS
-        ========================================= */
-
-        .continue-btn {
-            display: inline-flex;
-
-            align-items: center;
-            justify-content: center;
-
-            margin-top: 30px;
-
-            padding: 13px 25px;
-
-            border: 1px solid
-                rgba(201, 161, 90, 0.6);
-
-            background: transparent;
-
-            color: var(--gold-soft);
-
-            cursor: pointer;
-
-            text-transform: uppercase;
-
-            letter-spacing: 0.15em;
-
-            font-size: 0.68rem;
-
-            transition:
-                background 0.3s ease,
-                color 0.3s ease,
-                transform 0.3s ease;
-        }
-
-        .continue-btn:hover {
-            background: var(--gold);
-            color: var(--wine-deep);
-
-            transform: translateY(-2px);
-        }
-
-        /* =========================================
-           MUSIC
-        ========================================= */
-
-        .music-toggle {
-            position: fixed;
-
-            top:
-                max(20px, env(safe-area-inset-top));
-
-            right:
-                max(20px, env(safe-area-inset-right));
-
-            width: 44px;
-            height: 44px;
-
-            border-radius: 50%;
-
-            border: 1px solid
-                rgba(201, 161, 90, 0.45);
-
-            background:
-                rgba(53, 13, 23, 0.75);
-
-            color: var(--gold-soft);
-
-            display: flex;
-            align-items: center;
-            justify-content: center;
-
-            cursor: pointer;
-
-            z-index: 100;
-
-            font-family: "Cormorant Garamond", serif;
-
-            font-size: 1.25rem;
-
-            backdrop-filter: blur(8px);
-
-            transition:
-                opacity 0.3s ease,
-                transform 0.3s ease,
-                background 0.3s ease;
-        }
-
-        .music-toggle:hover {
-            transform: scale(1.08);
-
-            background:
-                rgba(74, 18, 32, 0.9);
-        }
-
-        /* =========================================
-           PAGE DOTS
-        ========================================= */
-
-        .page-dots {
-            position: fixed;
-
-            left: 50%;
-            bottom:
-                max(18px, env(safe-area-inset-bottom));
-
-            transform: translateX(-50%);
-
-            display: flex;
-            gap: 8px;
-
-            z-index: 100;
-        }
-
-        .page-dots button {
-            width: 7px;
-            height: 7px;
-
-            border-radius: 50%;
-
-            border: 1px solid var(--gold);
-
-            background: transparent;
-
-            padding: 0;
-
-            cursor: pointer;
-
-            opacity: 0.45;
-
-            transition:
-                background 0.3s ease,
-                opacity 0.3s ease,
-                transform 0.3s ease;
-        }
-
-        .page-dots button.active {
-            background: var(--gold);
-
-            opacity: 1;
-
-            transform: scale(1.3);
-        }
-
-        /* =========================================
-           NAV ARROWS
-        ========================================= */
-
-        .nav-arrow {
-            position: fixed;
-
-            top: 50%;
-
-            width: 44px;
-            height: 44px;
-
-            border: 1px solid
-                rgba(201, 161, 90, 0.3);
-
-            background:
-                rgba(53, 13, 23, 0.45);
-
-            color: var(--gold-soft);
-
-            border-radius: 50%;
-
-            display: flex;
-            align-items: center;
-            justify-content: center;
-
-            cursor: pointer;
-
-            z-index: 90;
-
-            transform: translateY(-50%);
-
-            transition:
-                opacity 0.3s ease,
-                transform 0.3s ease,
-                background 0.3s ease;
-        }
-
-        .nav-arrow:hover {
-            background:
-                rgba(74, 18, 32, 0.85);
-        }
-
-        .nav-prev {
-            left: 18px;
-        }
-
-        .nav-next {
-            right: 18px;
-        }
-
-        .nav-arrow.hidden {
-            opacity: 0;
-            pointer-events: none;
-        }
-
-        /* =========================================
-           RESPONSIVE
-        ========================================= */
-
-        @media (max-width: 600px) {
-
-            .page {
-                padding:
-                    65px
-                    18px
-                    65px;
-            }
-
-            .envelope-wrap {
-                width: min(340px, 88vw);
-                height: 235px;
-            }
-
-            .letter-card {
-                padding:
-                    38px
-                    28px;
-            }
-
-            .letter-card::before {
-                inset: 8px;
-            }
-
-            .memory-grid {
-                gap: 12px;
-            }
-
-            .polaroid {
-                padding: 7px 7px 23px;
-            }
-
-            .polaroid-caption {
-                font-size: 0.85rem;
-                bottom: 4px;
-            }
-
-            .nav-arrow {
-                width: 38px;
-                height: 38px;
-            }
-
-            .nav-prev {
-                left: 8px;
-            }
-
-            .nav-next {
-                right: 8px;
-            }
-
-            .music-toggle {
-                width: 40px;
-                height: 40px;
-            }
-        }
-
-        @media (max-height: 700px) {
-
-            .hero-title {
-                font-size: clamp(2.5rem, 8vw, 4.5rem);
-            }
-
-            .envelope-wrap {
-                height: 210px;
-                width: min(320px, 80vw);
-            }
-
-            .letter-card {
-                padding-top: 25px;
-                padding-bottom: 25px;
-            }
-
-            .letter-heading {
-                margin-bottom: 15px;
-            }
-
-            .letter-body {
-                font-size: 1.1rem;
-                line-height: 1.45;
-            }
-
-            .memory-grid {
-                max-height: 60vh;
-            }
-        }
-
-        /* =========================================
-           REDUCED MOTION
-        ========================================= */
-
-        @media (prefers-reduced-motion: reduce) {
-
-            *,
-            *::before,
-            *::after {
-                animation-duration: 0.001ms !important;
-                animation-iteration-count: 1 !important;
-                scroll-behavior: auto !important;
-                transition-duration: 0.001ms !important;
-            }
-        }
-    </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>for you, on your birthday</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Ctext y='24' font-size='24'%3E%E2%9D%A4%EF%B8%8F%3C/text%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500&family=Jost:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --wine: #4A1220;
+    --wine-deep: #350D17;
+    --blush: #F3D7DA;
+    --gold: #C9A15A;
+    --gold-soft: #E4C888;
+    --cream: #FBF4EC;
+    --ink: #2B1116;
+  }
+
+  *{ margin:0; padding:0; box-sizing:border-box; }
+
+  html, body{
+    height:100%;
+    overflow:hidden;
+  }
+
+  body{
+    font-family:'Jost', sans-serif;
+    background: var(--wine-deep);
+    color: var(--cream);
+  }
+
+  body::after{
+    content:"";
+    position:fixed;
+    inset:0;
+    pointer-events:none;
+    z-index:900;
+    opacity:0.035;
+    mix-blend-mode:overlay;
+    background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='120' height='120'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/></filter><rect width='100%25' height='100%25' filter='url(%23n)'/></svg>");
+  }
+
+  @media (prefers-reduced-motion: reduce){
+    *{ animation-duration:0.01ms !important; animation-iteration-count:1 !important; transition-duration:0.01ms !important; }
+  }
+
+  .visually-hidden{
+    position:absolute; width:1px; height:1px;
+    overflow:hidden; clip:rect(0 0 0 0); white-space:nowrap;
+  }
+
+  /* ---------- CURTAIN ---------- */
+  .curtain{
+    position:fixed; inset:0;
+    background: var(--wine-deep);
+    z-index:1000;
+    display:flex; align-items:center; justify-content:center;
+    transition: opacity 1s ease, visibility 1s ease;
+  }
+  .curtain span{
+    font-family:'Cormorant Garamond', serif;
+    font-style:italic;
+    color: var(--gold-soft);
+    font-size:1.05rem;
+    letter-spacing:0.06em;
+    opacity:0;
+    animation: fadeIn 1s ease 0.25s forwards;
+  }
+  .curtain.hide{ opacity:0; visibility:hidden; pointer-events:none; }
+
+  /* ---------- PAGER ---------- */
+  .pager{
+    position:relative;
+    width:100%;
+    height:100vh;
+    height:100dvh;
+    overflow:hidden;
+  }
+
+  .page{
+    position:absolute;
+    inset:0;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    justify-content:center;
+    text-align:center;
+    padding:2.5rem 1.5rem;
+    opacity:0;
+    transform: translateY(28px) scale(0.985);
+    transition: opacity 0.85s cubic-bezier(.22,.61,.36,1), transform 0.85s cubic-bezier(.22,.61,.36,1);
+    pointer-events:none;
+    z-index:1;
+    overflow-y:auto;
+  }
+
+  .page.active{
+    opacity:1;
+    transform: translateY(0) scale(1);
+    pointer-events:auto;
+    z-index:2;
+  }
+
+  .page.exiting{
+    opacity:0;
+    transform: translateY(-28px) scale(0.985);
+    z-index:1;
+  }
+
+  .page-hero{ background: radial-gradient(ellipse at 50% 20%, rgba(201,161,90,0.12), transparent 60%), var(--wine); }
+  .page-letter{ background: var(--cream); color: var(--ink); }
+  .page-memories{ background: var(--wine); }
+  .page-closing{ background: var(--wine-deep); }
+
+  /* ---------- NAV: dots + continue button ---------- */
+  .page-dots{
+    position:fixed;
+    left:50%;
+    bottom:22px;
+    transform: translateX(-50%);
+    display:flex;
+    gap:10px;
+    z-index:50;
+  }
+
+  .page-dots button{
+    width:7px; height:7px;
+    border-radius:50%;
+    border:1px solid rgba(243,215,218,0.55);
+    background: transparent;
+    padding:0;
+    cursor:pointer;
+    transition: background 0.3s ease, width 0.3s ease, border-color 0.3s ease;
+  }
+
+  .page-dots button.active{
+    background: var(--gold-soft);
+    border-color: var(--gold-soft);
+    width:20px;
+    border-radius:4px;
+  }
+
+  .continue-btn{
+    margin-top:2.6rem;
+    background:transparent;
+    border:1px solid rgba(0,0,0,0.18);
+    color: inherit;
+    font-family:'Jost', sans-serif;
+    font-size:0.85rem;
+    letter-spacing:0.03em;
+    padding:0.85rem 1.9rem;
+    border-radius:999px;
+    cursor:pointer;
+    display:inline-flex;
+    align-items:center;
+    gap:0.55rem;
+    transition: background 0.3s ease, color 0.3s ease, border-color 0.3s ease, transform 0.3s ease;
+  }
+
+  .page-memories .continue-btn,
+  .page-hero .continue-btn{
+    border-color: rgba(228,200,136,0.55);
+    color: var(--blush);
+  }
+
+  .continue-btn:hover{ transform: translateY(2px); }
+  .continue-btn:active{ transform: scale(0.96); }
+
+  .page-letter .continue-btn:hover{ background: var(--wine); color: var(--cream); border-color: var(--wine); }
+  .page-memories .continue-btn:hover, .page-hero .continue-btn:hover{ background: var(--gold-soft); color: var(--wine-deep); border-color: var(--gold-soft); }
+
+  .continue-btn .arrow{ display:inline-block; animation: nudge 1.8s ease-in-out infinite; }
+
+  @keyframes nudge{
+    0%, 100%{ transform: translateX(0); }
+    50%{ transform: translateX(4px); }
+  }
+
+  /* ---------- HERO / ENVELOPE ---------- */
+  .page-hero::before{
+    content:"";
+    position:absolute;
+    inset:0;
+    box-shadow: inset 0 0 170px rgba(0,0,0,0.5);
+    pointer-events:none;
+    z-index:0;
+  }
+
+  .corner{
+    position:absolute;
+    width:38px; height:38px;
+    border: 1px solid rgba(201,161,90,0.4);
+    z-index:1;
+  }
+  .corner-tl{ top:32px; left:32px; border-right:none; border-bottom:none; }
+  .corner-tr{ top:32px; right:32px; border-left:none; border-bottom:none; }
+  .corner-bl{ bottom:32px; left:32px; border-right:none; border-top:none; }
+  .corner-br{ bottom:32px; right:32px; border-left:none; border-top:none; }
+  @media (max-width:640px){
+    .corner{ width:22px; height:22px; }
+    .corner-tl, .corner-tr{ top:18px; }
+    .corner-bl, .corner-br{ bottom:18px; }
+    .corner-tl, .corner-bl{ left:18px; }
+    .corner-tr, .corner-br{ right:18px; }
+  }
+
+  .dust{
+    position:absolute; inset:0;
+    overflow:hidden;
+    pointer-events:none;
+    z-index:0;
+  }
+  .dust span{
+    position:absolute;
+    bottom:-4%;
+    width:3px; height:3px;
+    border-radius:50%;
+    background: var(--gold-soft);
+    opacity:0;
+    animation: dustFloat linear forwards;
+  }
+  @keyframes dustFloat{
+    0%{ opacity:0; transform:translateY(0); }
+    12%{ opacity:0.5; }
+    88%{ opacity:0.3; }
+    100%{ opacity:0; transform:translateY(-100vh); }
+  }
+
+  .hero-eyebrow{
+    font-size:0.95rem;
+    letter-spacing:0.04em;
+    color: var(--blush);
+    opacity:0;
+    margin-bottom:1.5rem;
+    font-weight:300;
+    position:relative;
+    z-index:1;
+    animation: fadeIn 1s ease 0.3s forwards;
+  }
+
+  @keyframes fadeIn{ to{ opacity:0.8; } }
+
+  .envelope-wrap{
+    perspective:1200px;
+    cursor:pointer;
+    user-select:none;
+    position:relative;
+    z-index:1;
+    opacity:0;
+    animation: floatIn 1s cubic-bezier(.22,.61,.36,1) 0.5s forwards, bob 4s ease-in-out 1.6s infinite;
+  }
+
+  @keyframes floatIn{
+    from{ opacity:0; transform: translateY(18px) scale(0.96); }
+    to{ opacity:1; transform: translateY(0) scale(1); }
+  }
+
+  @keyframes bob{
+    0%, 100%{ transform: translateY(0); }
+    50%{ transform: translateY(-8px); }
+  }
+
+  .envelope-wrap.open{ animation: floatIn 1s cubic-bezier(.22,.61,.36,1) forwards; }
+
+  .envelope{
+    width:260px;
+    height:170px;
+    position:relative;
+    transition: transform 0.35s ease;
+    transform-style: preserve-3d;
+  }
+
+  .env-body{
+    position:absolute; inset:0;
+    background: linear-gradient(180deg, #F6E9DD, #EAD6C0);
+    border-radius:4px;
+    box-shadow: 0 30px 60px -20px rgba(0,0,0,0.6);
+  }
+
+  .env-flap{
+    position:absolute; top:0; left:0; right:0; height:0;
+    border-left:130px solid transparent;
+    border-right:130px solid transparent;
+    border-top:105px solid #E4CBAE;
+    transform-origin:top;
+    transition: transform 0.9s cubic-bezier(.6,.1,.25,1);
+    z-index:3;
+  }
+
+  .envelope-wrap.open .env-flap{ transform: rotateX(180deg); }
+
+  .env-shadow-flap{
+    position:absolute; top:0; left:0; right:0; height:0;
+    border-left:130px solid transparent;
+    border-right:130px solid transparent;
+    border-top:105px solid #D9BE9C;
+    z-index:1;
+  }
+
+  .env-seal{
+    position:absolute;
+    top:82px; left:50%;
+    transform: translate(-50%, 0);
+    width:46px; height:46px;
+    background: radial-gradient(circle at 35% 30%, #D9B36C, var(--gold) 70%);
+    border-radius:50%;
+    display:flex; align-items:center; justify-content:center;
+    font-family:'Cormorant Garamond', serif;
+    font-style:italic;
+    font-size:1.3rem;
+    color: var(--wine-deep);
+    box-shadow: 0 6px 14px rgba(0,0,0,0.45);
+    z-index:4;
+    transition: opacity 0.4s ease, transform 0.4s ease;
+    animation: sealPulse 2.6s ease-in-out infinite;
+  }
+
+  @keyframes sealPulse{
+    0%, 100%{ box-shadow: 0 6px 14px rgba(0,0,0,0.45); }
+    50%{ box-shadow: 0 6px 22px rgba(201,161,90,0.6); }
+  }
+
+  .envelope-wrap.open .env-seal{
+    opacity:0;
+    transform: translate(-50%,-10px) scale(0.7);
+    animation: none;
+  }
+
+  .env-letter{
+    position:absolute;
+    left:14px; right:14px; bottom:8px;
+    height:120px;
+    background: var(--cream);
+    border-radius:3px;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+    transition: transform 0.9s cubic-bezier(.2,.7,.3,1) 0.15s;
+    z-index:2;
+  }
+
+  .envelope-wrap.open .env-letter{ transform: translateY(-190px); }
+
+  .hero-hint{
+    margin-top:2.2rem;
+    font-size:0.85rem;
+    color: var(--blush);
+    opacity:0;
+    letter-spacing:0.02em;
+    position:relative;
+    z-index:1;
+    animation: fadeIn 1s ease 0.9s forwards;
+  }
+
+  .envelope-wrap.open ~ .hero-hint{ animation: none; opacity:0; }
+
+  /* ---------- LETTER PAGE ---------- */
+  .letter-card{ max-width:620px; width:100%; }
+
+  .letter-mark{
+    width:34px; height:2px;
+    background: var(--gold);
+    margin-bottom:2rem;
+    transform-origin:left;
+    transform: scaleX(0);
+  }
+
+  .page-letter.active .letter-mark{ animation: growLine 0.7s ease 0.15s forwards; }
+
+  @keyframes growLine{ to{ transform: scaleX(1); } }
+
+  .letter-heading{
+    font-family:'Cormorant Garamond', serif;
+    font-weight:500;
+    font-style:italic;
+    font-size:clamp(2rem, 5vw, 2.9rem);
+    line-height:1.15;
+    margin-bottom:2rem;
+    color: var(--wine);
+    text-align:left;
+  }
+
+  .letter-body{ text-align:left; }
+
+  .letter-body p{
+    font-family:'Cormorant Garamond', serif;
+    font-size:1.3rem;
+    line-height:1.7;
+    margin-bottom:1.3rem;
+    color:#3A2028;
+    opacity:0;
+    transform: translateY(14px);
+  }
+
+  .page-letter.active .letter-heading,
+  .page-letter.active .letter-body p,
+  .page-letter.active .letter-signoff{
+    animation: riseIn 0.8s cubic-bezier(.22,.61,.36,1) forwards;
+  }
+
+  .page-letter.active .letter-heading{ opacity:0; transform: translateY(14px); animation-delay: 0.05s; }
+  .page-letter.active .letter-body p:nth-of-type(1){ animation-delay: 0.35s; }
+  .page-letter.active .letter-body p:nth-of-type(2){ animation-delay: 0.5s; }
+  .page-letter.active .letter-body p:nth-of-type(3){ animation-delay: 0.65s; }
+  .page-letter.active .letter-signoff{ opacity:0; transform: translateY(14px); animation-delay: 0.82s; }
+
+  @keyframes riseIn{ to{ opacity:1; transform: translateY(0); } }
+
+  .letter-body p:first-of-type::first-letter{
+    font-family:'Cormorant Garamond', serif;
+    font-weight:600;
+    font-style:normal;
+    font-size:3.2rem;
+    line-height:0.7;
+    float:left;
+    padding-right:0.12em;
+    padding-top:0.08em;
+    color: var(--gold);
+  }
+
+  .letter-signoff{
+    margin-top:1.6rem;
+    font-family:'Cormorant Garamond', serif;
+    font-style:italic;
+    font-size:1.5rem;
+    color: var(--wine);
+    text-align:left;
+  }
+
+  /* ---------- MEMORIES PAGE ---------- */
+  .memories-heading{
+    font-family:'Cormorant Garamond', serif;
+    font-style:italic;
+    font-weight:500;
+    font-size:clamp(1.7rem, 4vw, 2.2rem);
+    color: var(--blush);
+    margin-bottom:0.6rem;
+    opacity:0;
+  }
+
+  .memories-sub{
+    font-size:0.85rem;
+    color: var(--blush);
+    opacity:0;
+    max-width:420px;
+    margin:0 auto 2.2rem;
+    line-height:1.6;
+  }
+
+  .page-memories.active .memories-heading{ animation: riseIn 0.7s ease 0.1s forwards; }
+  .page-memories.active .memories-sub{ animation: riseIn 0.7s ease 0.25s forwards; opacity:0; transform:translateY(14px); }
+
+  .memories-grid{
+    max-width:520px;
+    margin:0 auto;
+    display:grid;
+    grid-template-columns:repeat(2, 1fr);
+    gap:1.6rem 1.4rem;
+  }
+
+  .polaroid{
+    background:#FBF9F5;
+    padding:12px 12px 36px;
+    box-shadow: 0 18px 30px -12px rgba(0,0,0,0.5);
+    transition: transform 0.35s ease, box-shadow 0.35s ease;
+    opacity:0;
+    transform: translateY(20px) scale(0.92);
+  }
+
+  .polaroid:nth-child(1){ --tilt:-4deg; }
+  .polaroid:nth-child(2){ --tilt:3deg; }
+  .polaroid:nth-child(3){ --tilt:-2deg; }
+  .polaroid:nth-child(4){ --tilt:4deg; }
+
+  .page-memories.active .polaroid{ animation: popIn 0.7s cubic-bezier(.2,.8,.3,1.15) forwards; }
+
+  .page-memories.active .polaroid:nth-child(1){ animation-delay:0.35s; }
+  .page-memories.active .polaroid:nth-child(2){ animation-delay:0.48s; }
+  .page-memories.active .polaroid:nth-child(3){ animation-delay:0.61s; }
+  .page-memories.active .polaroid:nth-child(4){ animation-delay:0.74s; }
+
+  @keyframes popIn{ to{ opacity:1; transform: translateY(0) scale(1) rotate(var(--tilt)); } }
+
+  .polaroid{ cursor: zoom-in; }
+
+  .polaroid:hover{
+    transform: rotate(0deg) translateY(-6px) scale(1.04) !important;
+    box-shadow: 0 24px 38px -12px rgba(0,0,0,0.55);
+  }
+
+  .photo-slot{
+    width:100%;
+    aspect-ratio: 1 / 1;
+    background: linear-gradient(135deg, #6B2233, #4A1220 55%, #7A3145);
+    display:flex; align-items:center; justify-content:center;
+    color: rgba(243,215,218,0.55);
+    font-size:0.68rem;
+    letter-spacing:0.02em;
+    text-align:center;
+    padding:0.6rem;
+  }
+
+  /* To use a real photo: replace the .photo-slot div's content with
+     <img src="your-photo.jpg" style="width:100%;height:100%;object-fit:cover;"> */
+
+  .polaroid-caption{
+    display:block; text-align:center; margin-top:10px;
+    font-family:'Cormorant Garamond', serif;
+    font-style:italic;
+    font-size:0.92rem;
+    color: var(--ink);
+  }
+
+  /* ---------- CLOSING PAGE ---------- */
+  .page-closing::before{
+    content:"";
+    position:absolute; inset:0;
+    background: radial-gradient(circle at 50% 42%, rgba(201,161,90,0.16), transparent 62%);
+    pointer-events:none;
+  }
+
+  .closing-line{
+    font-family:'Cormorant Garamond', serif;
+    font-style:italic;
+    font-weight:500;
+    font-size:clamp(2rem, 6vw, 3.2rem);
+    color: var(--cream);
+    max-width:640px;
+    line-height:1.2;
+    margin-bottom:2.2rem;
+    text-shadow: 0 2px 30px rgba(0,0,0,0.4);
+    position:relative;
+    z-index:1;
+    opacity:0;
+    transform: translateY(16px);
+  }
+
+  .page-closing.active .closing-line{ animation: riseIn 0.9s cubic-bezier(.22,.61,.36,1) 0.2s forwards; }
+
+  .seal-button{
+    background: transparent;
+    border: 1px solid var(--gold-soft);
+    color: var(--gold-soft);
+    font-family:'Jost', sans-serif;
+    font-weight:400;
+    font-size:0.9rem;
+    letter-spacing:0.03em;
+    padding: 0.95rem 2.1rem;
+    border-radius:999px;
+    cursor:pointer;
+    transition: background 0.3s ease, color 0.3s ease, box-shadow 0.3s ease, transform 0.2s ease;
+    position:relative;
+    z-index:1;
+    opacity:0;
+  }
+
+  .page-closing.active .seal-button{ animation: riseIn 0.9s cubic-bezier(.22,.61,.36,1) 0.5s forwards; }
+
+  .seal-button:hover, .seal-button:focus-visible{
+    background: var(--gold-soft);
+    color: var(--wine-deep);
+    box-shadow: 0 0 26px rgba(228,200,136,0.45);
+  }
+  .seal-button:active{ transform: scale(0.96); }
+  .seal-button:focus-visible{ outline: 2px solid var(--blush); outline-offset:3px; }
+
+  .replay-link{
+    margin-top:1.6rem;
+    background:none; border:none;
+    color: var(--blush);
+    opacity:0;
+    font-size:0.78rem;
+    letter-spacing:0.03em;
+    text-decoration:underline;
+    text-underline-offset:3px;
+    cursor:pointer;
+    position:relative; z-index:1;
+  }
+
+  .page-closing.active .replay-link{ animation: riseIn 0.9s ease 0.75s forwards; }
+  .replay-link:hover{ color: var(--gold-soft); }
+
+  .heart{
+    position:absolute;
+    bottom:-10%;
+    font-size:1.3rem;
+    color: var(--blush);
+    opacity:0.9;
+    pointer-events:none;
+    animation: floatUp 3.6s ease-in forwards;
+  }
+
+  .heart.ambient{
+    font-size:0.95rem;
+    opacity:0.55;
+    animation: floatUp 5.5s ease-in forwards;
+  }
+
+  @keyframes floatUp{
+    0%{ transform: translateY(0) translateX(0) rotate(0deg); opacity:0.9; }
+    100%{ transform: translateY(-92vh) translateX(var(--drift,0px)) rotate(20deg); opacity:0; }
+  }
+
+  a, button{ font-family:inherit; }
+
+  .music-toggle{
+    position:fixed;
+    top:20px;
+    right:20px;
+    width:50px;
+    height:50px;
+    border-radius:50%;
+    background: rgba(201,161,90,0.15);
+    border: 1.5px solid var(--gold-soft);
+    color: var(--gold-soft);
+    font-size:1.2rem;
+    cursor:pointer;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    transition: background 0.3s ease, transform 0.2s ease;
+    z-index:100;
+  }
+
+  .music-toggle:hover{
+    background: rgba(201,161,90,0.25);
+    transform: scale(1.08);
+  }
+
+  .music-toggle:active{ transform: scale(0.96); }
+
+  ::selection{ background: var(--gold-soft); color: var(--wine-deep); }
+</style>
 </head>
-
 <body>
 
-<div class="app">
+<div class="curtain" id="curtain"><span>opening something for you...</span></div>
+<div id="pageAnnounce" class="visually-hidden" aria-live="polite"></div>
 
-    <!-- =========================================
-         BACKGROUND
-    ========================================= -->
+<audio id="bgMusic" muted loop preload="auto">
+  <source src="music.mp3" type="audio/mpeg">
+</audio>
 
-    <div class="background-glow glow-one"></div>
-    <div class="background-glow glow-two"></div>
+<button class="music-toggle" id="musicToggle" title="Toggle music" aria-label="Toggle background music">♫</button>
 
-    <div
-        class="dust-container"
-        id="dustContainer">
+<div class="pager" id="pager">
+
+  <section class="page page-hero active" data-index="0">
+    <div class="corner corner-tl"></div>
+    <div class="corner corner-tr"></div>
+    <div class="corner corner-bl"></div>
+    <div class="corner corner-br"></div>
+    <div class="dust" id="dust"></div>
+
+    <p class="hero-eyebrow">for you, on your birthday</p>
+
+    <div class="envelope-wrap" id="envelopeWrap" role="button" tabindex="0" aria-label="Open envelope">
+      <div class="envelope" id="envelope">
+        <div class="env-shadow-flap"></div>
+        <div class="env-letter"></div>
+        <div class="env-body"></div>
+        <div class="env-flap"></div>
+        <div class="env-seal">S</div>
+      </div>
     </div>
 
-
-    <!-- =========================================
-         BACKGROUND MUSIC
-    ========================================= -->
-
-    <audio
-        id="bgMusic"
-        loop
-        preload="auto"
-    >
-        <source
-            src="music.mp3"
-            type="audio/mpeg"
-        >
-    </audio>
-
-
-    <!-- =========================================
-         MUSIC BUTTON
-    ========================================= -->
-
-    <button
-        class="music-toggle"
-        id="musicToggle"
-        title="Toggle music"
-        aria-label="Play background music"
-    >
-        ♫
-    </button>
-
-
-    <!-- =========================================
-         PAGES
-    ========================================= -->
-
-    <main class="pages">
-
-
-        <!-- =====================================
-             PAGE 0 — ENVELOPE
-        ====================================== -->
-
-        <section
-            class="page active"
-            data-page="0"
-        >
-
-            <div class="page-content hero">
-
-                <div class="hero-intro">
-
-                    <div class="eyebrow">
-                        A little something for you
-                    </div>
-
-                    <h1 class="hero-title">
-                        For You
-                    </h1>
-
-                    <p class="hero-subtitle">
-                        Open when you're ready.
-                    </p>
-
-                </div>
-
-
-                <div
-                    class="envelope-wrap"
-                    id="envelopeWrap"
-                    role="button"
-                    tabindex="0"
-                    aria-label="Open your birthday letter"
-                >
-
-                    <div
-                        class="envelope"
-                        id="envelope"
-                    >
-
-                        <div class="envelope-back"></div>
-
-                        <div class="envelope-flap"></div>
-
-                        <div class="envelope-front"></div>
-
-                        <div class="seal">
-                            ♥
-                        </div>
-
-                    </div>
-
-                    <div class="open-label">
-                        Tap to open
-                    </div>
-
-                </div>
-
-            </div>
-
-        </section>
-
-
-        <!-- =====================================
-             PAGE 1 — LETTER
-        ====================================== -->
-
-        <section
-            class="page letter-page"
-            data-page="1"
-        >
-
-            <div class="page-content">
-
-                <article class="letter-card">
-
-                    <div class="eyebrow">
-                        A letter for you
-                    </div>
-
-                    <h1 class="letter-heading">
-                        Happy Birthday B!.
-                    </h1>
-
-                    <div class="letter-body">
-
-                        <p>
-                            Today is a special day because it is
-                            the day someone very special to me was
-                            born.
-                        </p>
-
-                        <p>
-                            I hope you know how much you mean to me.
-                            Through all the little moments, the laughs,
-                            the conversations, and everything we have
-                            shared, I am grateful that I get to have
-                            you in my life.
-                        </p>
-
-                        <p>
-                            I hope this new chapter brings you more
-                            happiness, more beautiful memories, and
-                            everything your heart has been wishing for.
-                        </p>
-
-                        <p>
-                            No matter how simple this little surprise
-                            may be, I made it with love just for you.
-                        </p>
-
-                    </div>
-
-                    <div class="signature">
-                        With love,<br>
-                        Diether
-                    </div>
-
-                    <div style="text-align:center;">
-
-                        <button
-                            class="continue-btn"
-                            onclick="goToPage(2)"
-                        >
-                            Our Memories →
-                        </button>
-
-                    </div>
-
-                </article>
-
-            </div>
-
-        </section>
-
-
-        <!-- =====================================
-             PAGE 2 — MEMORIES
-        ====================================== -->
-
-        <section
-            class="page memories-page"
-            data-page="2"
-        >
-
-            <div class="page-content">
-
-                <header class="memories-header">
-
-                    <div class="eyebrow">
-                        Little moments
-                    </div>
-
-                    <h1 class="memories-title">
-                        Our Memories
-                    </h1>
-
-                    <p class="memories-subtitle">
-                        Some moments I never want to forget.
-                    </p>
-
-                </header>
-
-
-                <div class="memory-grid">
-
-
-                    <div
-                        class="polaroid"
-                        tabindex="0"
-                    >
-
-                        <img
-                            src="photo1.jpg"
-                            alt="Our first memory"
-                            loading="lazy"
-                        >
-
-                        <div class="polaroid-caption">
-                            A moment worth remembering
-                        </div>
-
-                    </div>
-
-
-                    <div
-                        class="polaroid"
-                        tabindex="0"
-                    >
-
-                        <img
-                            src="photo2.jpg"
-                            alt="A beautiful memory"
-                            loading="lazy"
-                        >
-
-                        <div class="polaroid-caption">
-                            One of my favorites
-                        </div>
-
-                    </div>
-
-
-                    <div
-                        class="polaroid"
-                        tabindex="0"
-                    >
-
-                        <img
-                            src="photo3.jpg"
-                            alt="Another memory together"
-                            loading="lazy"
-                        >
-
-                        <div class="polaroid-caption">
-                            Another little memory
-                        </div>
-
-                    </div>
-
-
-                    <div
-                        class="polaroid"
-                        tabindex="0"
-                    >
-
-                        <img
-                            src="photo4.jpeg"
-                            alt="A special memory"
-                            loading="lazy"
-                        >
-
-                        <div class="polaroid-caption">
-                            Forever grateful
-                        </div>
-
-                    </div>
-
-                </div>
-
-
-                <div style="text-align:center;">
-
-                    <button
-                        class="continue-btn"
-                        onclick="goToPage(3)"
-                    >
-                        One More Thing →
-                    </button>
-
-                </div>
-
-            </div>
-
-        </section>
-
-
-        <!-- =====================================
-             PAGE 3 — CLOSING
-        ====================================== -->
-
-        <section
-            class="page"
-            data-page="3"
-        >
-
-            <div class="page-content closing">
-
-                <div class="eyebrow">
-                    Before you go...
-                </div>
-
-                <h1 class="closing-title">
-                    Happy Birthday
-                </h1>
-
-                <p class="closing-message">
-
-                    I hope today reminds you of just how loved,
-                    appreciated, and special you are.
-
-                    <br><br>
-
-                    Here's to another year of your beautiful life,
-                    and hopefully many more memories together.
-
-                </p>
-
-                <div class="heart">
-                    ♥
-                </div>
-
-                <br>
-
-                <button
-                    class="continue-btn"
-                    onclick="replaySurprise()"
-                >
-                    Replay
-                </button>
-
-            </div>
-
-        </section>
-
-    </main>
-
-
-    <!-- =========================================
-         NAVIGATION DOTS
-    ========================================= -->
-
-    <div
-        class="page-dots"
-        id="pageDots"
-        aria-label="Page navigation"
-    >
-
-        <button
-            class="active"
-            data-page="0"
-            aria-label="Go to page 1"
-        ></button>
-
-        <button
-            data-page="1"
-            aria-label="Go to page 2"
-        ></button>
-
-        <button
-            data-page="2"
-            aria-label="Go to page 3"
-        ></button>
-
-        <button
-            data-page="3"
-            aria-label="Go to page 4"
-        ></button>
-
+    <p class="hero-hint">tap the envelope</p>
+  </section>
+
+  <section class="page page-letter" data-index="1">
+    <div class="letter-card">
+      <div class="letter-mark"></div>
+      <h1 class="letter-heading">Happy Birthday B!.</h1>
+      <div class="letter-body">
+        <p>I wanted today to start with something just for you, before the calls and the cake and everyone else gets their turn to make a fuss. This one's from me first.</p>
+        <p>Edit this paragraph with something only the two of you would know — the way you two met, an inside joke, a specific morning you keep thinking about. The more specific it is, the more it'll feel like you wrote it, not a template.</p>
+        <p>Whatever this year brings, I want to be next to you for it — the ordinary Tuesdays and the big ones alike.</p>
+      </div>
+      <p class="letter-signoff">— always yours</p>
+      <button class="continue-btn next-btn">a few of my favorites <span class="arrow">→</span></button>
     </div>
+  </section>
 
+  <section class="page page-memories" data-index="2">
+    <h2 class="memories-heading">a few of my favorites</h2>
+    <p class="memories-sub">Replace these four with real photos of you two — instructions are in the code comments.</p>
+    <div class="memories-grid">
+      <div class="polaroid">
+        <img src="photo1.jpg" style="width:100%;height:100%;object-fit:cover;">
+        <span class="polaroid-caption">the first one</span>
+      </div>
+      <div class="polaroid">
+        <img src="photo2.jpg" style="width:100%;height:100%;object-fit:cover;">
+        <span class="polaroid-caption">that trip</span>
+      </div>
+      <div class="polaroid">
+        <img src="photo3.jpg" style="width:100%;height:100%;object-fit:cover;">
+        <span class="polaroid-caption">just because</span>
+      </div>
+      <div class="polaroid">
+        <img src="photo4.jpeg" style="width:100%;height:100%;object-fit:cover;">
+        <span class="polaroid-caption">us, lately</span>
+      </div>
+    </div>
+    <button class="continue-btn next-btn">one more thing <span class="arrow">→</span></button>
+  </section>
 
-    <!-- =========================================
-         NAVIGATION ARROWS
-    ========================================= -->
-
-    <button
-        class="nav-arrow nav-prev hidden"
-        id="prevBtn"
-        aria-label="Previous page"
-    >
-        ‹
-    </button>
-
-    <button
-        class="nav-arrow nav-next"
-        id="nextBtn"
-        aria-label="Next page"
-    >
-        ›
-    </button>
+  <section class="page page-closing" data-index="3">
+    <p class="closing-line">Here's to another year of us.</p>
+    <button class="seal-button" id="heartButton">send love</button>
+    <button class="replay-link" id="replayBtn">watch it again</button>
+  </section>
 
 </div>
 
+<div class="page-dots" id="pageDots"></div>
 
 <script>
+  const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const pages = Array.from(document.querySelectorAll('.page'));
+  const pageTitles = [
+    'for you, on your birthday',
+    'open me',
+    'a few of my favorites',
+    'happy birthday'
+  ];
+  const announce = document.getElementById('pageAnnounce');
+  let currentIndex = 0;
 
-    /* =========================================
-       PAGE SYSTEM
-    ========================================= */
+  // curtain: cinematic fade-in on load
+  window.addEventListener('load', () => {
+    setTimeout(() => document.getElementById('curtain').classList.add('hide'), 650);
+  });
 
-    const pages =
-        Array.from(
-            document.querySelectorAll(".page")
-        );
+  // page dots
+  const dotsWrap = document.getElementById('pageDots');
+  pages.forEach((p, i) => {
+    const b = document.createElement('button');
+    b.setAttribute('aria-label', 'Go to page ' + (i + 1));
+    if(i === 0) b.classList.add('active');
+    b.addEventListener('click', () => goToPage(i));
+    dotsWrap.appendChild(b);
+  });
+  const dotEls = Array.from(dotsWrap.children);
 
-    const dots =
-        Array.from(
-            document.querySelectorAll(".page-dots button")
-        );
+  function goToPage(i){
+    if(i === currentIndex || i < 0 || i >= pages.length) return;
+    const current = pages[currentIndex];
+    const next = pages[i];
 
-    const prevBtn =
-        document.getElementById("prevBtn");
+    current.classList.remove('active');
+    current.classList.add('exiting');
+    next.classList.remove('exiting');
 
-    const nextBtn =
-        document.getElementById("nextBtn");
+    // restart child entrance animations each time a page becomes active
+    next.querySelectorAll('*').forEach(el => { el.style.animation = 'none'; });
+    void next.offsetWidth;
+    next.querySelectorAll('*').forEach(el => { el.style.animation = ''; });
 
-    const wrap =
-        document.getElementById("envelopeWrap");
+    requestAnimationFrame(() => next.classList.add('active'));
+    setTimeout(() => current.classList.remove('exiting'), 900);
 
-    const envelopeEl =
-        document.getElementById("envelope");
+    dotEls[currentIndex].classList.remove('active');
+    dotEls[i].classList.add('active');
+    currentIndex = i;
 
+    document.title = pageTitles[i];
+    announce.textContent = 'Page ' + (i + 1) + ' of ' + pages.length;
+  }
 
-    let currentPage = 0;
+  // gentle drifting gold dust behind the envelope
+  const dustContainer = document.getElementById('dust');
+  if(dustContainer && !prefersReducedMotion){
+    for(let i = 0; i < 16; i++){
+      const d = document.createElement('span');
+      d.style.left = (Math.random()*100) + '%';
+      d.style.animationDuration = (7 + Math.random()*6) + 's';
+      d.style.animationDelay = (Math.random()*10) + 's';
+      dustContainer.appendChild(d);
+    }
+  }
 
-    let isChangingPage = false;
+  const wrap = document.getElementById('envelopeWrap');
+  const envelopeEl = document.getElementById('envelope');
 
+  function openEnvelope(){
+    if(wrap.classList.contains('open')) return;
+    wrap.classList.add('open');
+    envelopeEl.style.transform = '';
 
-    function goToPage(index) {
-
-        if (index < 0) {
-            index = 0;
-        }
-
-        if (index >= pages.length) {
-            index = pages.length - 1;
-        }
-
-        if (index === currentPage) {
-            return;
-        }
-
-        if (isChangingPage) {
-            return;
-        }
-
-        isChangingPage = true;
-
-        pages[currentPage]
-            .classList
-            .remove("active");
-
-        dots[currentPage]
-            .classList
-            .remove("active");
-
-        currentPage = index;
-
-        pages[currentPage]
-            .classList
-            .add("active");
-
-        dots[currentPage]
-            .classList
-            .add("active");
-
-        updateNavigation();
-
-        setTimeout(() => {
-            isChangingPage = false;
-        }, 800);
+    // Auto-play music when envelope opens
+    try {
+      bgMusic.muted = false;
+      bgMusic.play().then(() => {
+        isMusicPlaying = true;
+        updateMusicButton();
+      }).catch(err => {
+        console.log('Auto-play was prevented:', err);
+      });
+    } catch(err) {
+      console.log('Audio play error:', err);
     }
 
+    setTimeout(() => goToPage(1), 1000);
+  }
 
-    function updateNavigation() {
+  wrap.addEventListener('click', openEnvelope);
+  wrap.addEventListener('keydown', (e) => {
+    if(e.key === 'Enter' || e.key === ' '){ e.preventDefault(); openEnvelope(); }
+  });
 
-        if (currentPage === 0) {
-
-            prevBtn.classList.add("hidden");
-
-        } else {
-
-            prevBtn.classList.remove("hidden");
-        }
-
-
-        if (currentPage === pages.length - 1) {
-
-            nextBtn.classList.add("hidden");
-
-        } else {
-
-            nextBtn.classList.remove("hidden");
-        }
-    }
-
-
-    prevBtn.addEventListener(
-        "click",
-        () => {
-            goToPage(currentPage - 1);
-        }
-    );
-
-
-    nextBtn.addEventListener(
-        "click",
-        () => {
-            goToPage(currentPage + 1);
-        }
-    );
-
-
-    dots.forEach((dot) => {
-
-        dot.addEventListener(
-            "click",
-            () => {
-
-                const page =
-                    Number(
-                        dot.dataset.page
-                    );
-
-                goToPage(page);
-            }
-        );
-
+  // subtle cursor-following tilt on the envelope, desktop only
+  if(window.matchMedia('(pointer: fine)').matches && !prefersReducedMotion){
+    wrap.addEventListener('mousemove', (e) => {
+      if(wrap.classList.contains('open')) return;
+      const rect = wrap.getBoundingClientRect();
+      const relX = (e.clientX - rect.left) / rect.width - 0.5;
+      const relY = (e.clientY - rect.top) / rect.height - 0.5;
+      envelopeEl.style.transform = 'rotateX(' + (-relY * 10).toFixed(2) + 'deg) rotateY(' + (relX * 10).toFixed(2) + 'deg)';
     });
+    wrap.addEventListener('mouseleave', () => { envelopeEl.style.transform = ''; });
+  }
 
+  document.querySelectorAll('.next-btn').forEach(btn => {
+    btn.addEventListener('click', () => goToPage(currentIndex + 1));
+  });
 
-    /* =========================================
-       ENVELOPE
-    ========================================= */
-
-    wrap.addEventListener(
-        "click",
-        openEnvelope
-    );
-
-
-    wrap.addEventListener(
-        "keydown",
-        (event) => {
-
-            if (
-                event.key === "Enter" ||
-                event.key === " "
-            ) {
-
-                event.preventDefault();
-
-                openEnvelope();
-            }
-
-        }
-    );
-
-
-    async function startBackgroundMusic() {
-
-        if (!bgMusic) {
-            return;
-        }
-
-        try {
-
-            bgMusic.muted = false;
-
-            bgMusic.volume = 0.65;
-
-            await bgMusic.play();
-
-            isMusicPlaying = true;
-
-            updateMusicButton();
-
-        } catch (error) {
-
-            console.log(
-                "Background music could not start:",
-                error
-            );
-
-            isMusicPlaying = false;
-
-            updateMusicButton();
-        }
+  // tap a photo to zoom it slightly; tap anywhere else to un-zoom
+  const polaroids = Array.from(document.querySelectorAll('.polaroid'));
+  polaroids.forEach(p => {
+    p.addEventListener('click', (e) => {
+      e.stopPropagation();
+      const wasZoomed = p.classList.contains('zoomed');
+      polaroids.forEach(o => o.classList.remove('zoomed'));
+      if(!wasZoomed) p.classList.add('zoomed');
+    });
+  });
+  function unzoomIfOutside(e){
+    if(!e.target.closest('.polaroid')){
+      polaroids.forEach(o => o.classList.remove('zoomed'));
     }
+  }
+  document.addEventListener('touchstart', unzoomIfOutside, { passive:true });
+  document.addEventListener('click', unzoomIfOutside);
 
-
-    function openEnvelope() {
-
-        if (
-            wrap.classList.contains("open")
-        ) {
-            return;
-        }
-
-        /*
-         * This click is a real user interaction.
-         * Therefore the browser is allowed to start
-         * the audio in most modern browsers.
-         */
-
-        startBackgroundMusic();
-
-
-        wrap.classList.add("open");
-
-        envelopeEl.style.transform = "";
-
-
-        setTimeout(() => {
-
-            goToPage(1);
-
-        }, 1000);
+  // swipe navigation for touch devices (only once past the envelope page)
+  let touchStartX = null;
+  const pagerEl = document.getElementById('pager');
+  pagerEl.addEventListener('touchstart', (e) => { touchStartX = e.changedTouches[0].clientX; }, { passive:true });
+  pagerEl.addEventListener('touchend', (e) => {
+    if(touchStartX === null || currentIndex === 0) return;
+    const dx = e.changedTouches[0].clientX - touchStartX;
+    if(Math.abs(dx) > 55){
+      goToPage(dx < 0 ? currentIndex + 1 : currentIndex - 1);
     }
+    touchStartX = null;
+  }, { passive:true });
 
+  document.addEventListener('keydown', (e) => {
+    if(e.key === 'ArrowRight') goToPage(currentIndex + 1);
+    if(e.key === 'ArrowLeft') goToPage(currentIndex - 1);
+  });
 
-    /* =========================================
-       REPLAY
-    ========================================= */
+  const closingPage = document.querySelector('.page-closing');
+  const heartBtn = document.getElementById('heartButton');
+  const replayBtn = document.getElementById('replayBtn');
 
-    function replaySurprise() {
+  function spawnHeart(ambient){
+    const h = document.createElement('span');
+    h.className = 'heart' + (ambient ? ' ambient' : '');
+    h.textContent = ['♥','❤','♡'][Math.floor(Math.random()*3)];
+    h.style.left = (Math.random()*100) + '%';
+    h.style.setProperty('--drift', (Math.random()*160 - 80) + 'px');
+    h.style.animationDelay = (Math.random()*0.6) + 's';
+    h.style.fontSize = (0.9 + Math.random()*1.1) + 'rem';
+    closingPage.appendChild(h);
+    setTimeout(() => h.remove(), 6000);
+  }
 
-        wrap.classList.remove("open");
+  heartBtn.addEventListener('click', () => {
+    for(let i = 0; i < 22; i++) spawnHeart(false);
+  });
 
-        goToPage(0);
+  replayBtn.addEventListener('click', () => {
+    wrap.classList.remove('open');
+    goToPage(0);
+  });
 
-        window.scrollTo({
-            top: 0,
-            behavior: "smooth"
-        });
+  // a slow, occasional heart while resting on the closing page
+  if(!prefersReducedMotion){
+    setInterval(() => {
+      if(closingPage.classList.contains('active')) spawnHeart(true);
+    }, 3200);
+  }
 
-        /*
-         * Music intentionally keeps playing.
-         */
+  // Music control
+  const bgMusic = document.getElementById('bgMusic');
+  const musicToggle = document.getElementById('musicToggle');
+  let isMusicPlaying = false;
 
-        if (
-            bgMusic.paused &&
-            !isMusicPlaying
-        ) {
-
-            startBackgroundMusic();
-        }
+  musicToggle.addEventListener('click', async () => {
+    try {
+      if(isMusicPlaying){
+        bgMusic.pause();
+        isMusicPlaying = false;
+      } else {
+        bgMusic.muted = false;
+        await bgMusic.play();
+        isMusicPlaying = true;
+      }
+      updateMusicButton();
+    } catch(err){
+      console.log('Audio control error:', err);
     }
+  });
 
-
-    /* =========================================
-       MUSIC
-    ========================================= */
-
-    const bgMusic =
-        document.getElementById("bgMusic");
-
-    const musicToggle =
-        document.getElementById("musicToggle");
-
-
-    let isMusicPlaying = false;
-
-    let isTransitioning = false;
-
-
-    bgMusic.volume = 0.65;
-
-
-    musicToggle.addEventListener(
-        "click",
-        async () => {
-
-            if (isTransitioning) {
-                return;
-            }
-
-            isTransitioning = true;
-
-
-            try {
-
-                if (isMusicPlaying) {
-
-                    bgMusic.pause();
-
-                    isMusicPlaying = false;
-
-                } else {
-
-                    bgMusic.muted = false;
-
-                    await bgMusic.play();
-
-                    isMusicPlaying = true;
-                }
-
-
-                updateMusicButton();
-
-            } catch (error) {
-
-                console.log(
-                    "Audio control error:",
-                    error
-                );
-
-                isMusicPlaying = false;
-
-                updateMusicButton();
-
-            } finally {
-
-                setTimeout(() => {
-
-                    isTransitioning = false;
-
-                }, 100);
-
-            }
-
-        }
-    );
-
-
-    bgMusic.addEventListener(
-        "play",
-        () => {
-
-            isMusicPlaying = true;
-
-            updateMusicButton();
-
-        }
-    );
-
-
-    bgMusic.addEventListener(
-        "pause",
-        () => {
-
-            isMusicPlaying = false;
-
-            updateMusicButton();
-
-        }
-    );
-
-
-    bgMusic.addEventListener(
-        "ended",
-        () => {
-
-            isMusicPlaying = false;
-
-            updateMusicButton();
-
-        }
-    );
-
-
-    function updateMusicButton() {
-
-        if (isMusicPlaying) {
-
-            musicToggle.style.opacity = "1";
-
-            musicToggle.textContent = "♪";
-
-            musicToggle.setAttribute(
-                "aria-label",
-                "Pause background music"
-            );
-
-            musicToggle.title =
-                "Pause background music";
-
-        } else {
-
-            musicToggle.style.opacity = "0.5";
-
-            musicToggle.textContent = "♫";
-
-            musicToggle.setAttribute(
-                "aria-label",
-                "Play background music"
-            );
-
-            musicToggle.title =
-                "Play background music";
-        }
-    }
-
-
+  bgMusic.addEventListener('play', () => {
+    isMusicPlaying = true;
     updateMusicButton();
+  });
 
+  bgMusic.addEventListener('pause', () => {
+    isMusicPlaying = false;
+    updateMusicButton();
+  });
 
-    /* =========================================
-       POLAROID INTERACTION
-    ========================================= */
-
-    const polaroids =
-        document.querySelectorAll(".polaroid");
-
-
-    polaroids.forEach((polaroid) => {
-
-        polaroid.addEventListener(
-            "click",
-            () => {
-
-                polaroid.classList.toggle(
-                    "zoomed"
-                );
-
-            }
-        );
-
-
-        polaroid.addEventListener(
-            "keydown",
-            (event) => {
-
-                if (
-                    event.key === "Enter" ||
-                    event.key === " "
-                ) {
-
-                    event.preventDefault();
-
-                    polaroid.classList.toggle(
-                        "zoomed"
-                    );
-
-                }
-
-            }
-        );
-
-    });
-
-
-    /* =========================================
-       SWIPE NAVIGATION
-    ========================================= */
-
-    let touchStartX = 0;
-    let touchStartY = 0;
-
-    let touchEndX = 0;
-    let touchEndY = 0;
-
-
-    document.addEventListener(
-        "touchstart",
-        (event) => {
-
-            const touch =
-                event.changedTouches[0];
-
-            touchStartX =
-                touch.screenX;
-
-            touchStartY =
-                touch.screenY;
-
-        },
-        {
-            passive: true
-        }
-    );
-
-
-    document.addEventListener(
-        "touchend",
-        (event) => {
-
-            const touch =
-                event.changedTouches[0];
-
-            touchEndX =
-                touch.screenX;
-
-            touchEndY =
-                touch.screenY;
-
-            handleSwipe();
-
-        },
-        {
-            passive: true
-        }
-    );
-
-
-    function handleSwipe() {
-
-        const diffX =
-            touchEndX - touchStartX;
-
-        const diffY =
-            touchEndY - touchStartY;
-
-
-        /*
-         * Ignore mostly vertical gestures.
-         */
-
-        if (
-            Math.abs(diffY) >
-            Math.abs(diffX)
-        ) {
-            return;
-        }
-
-
-        if (
-            Math.abs(diffX) < 60
-        ) {
-            return;
-        }
-
-
-        if (diffX < 0) {
-
-            goToPage(
-                currentPage + 1
-            );
-
-        } else {
-
-            goToPage(
-                currentPage - 1
-            );
-        }
+  function updateMusicButton(){
+    if(isMusicPlaying){
+      musicToggle.style.opacity = '1';
+      musicToggle.textContent = '♪';
+    } else {
+      musicToggle.style.opacity = '0.5';
+      musicToggle.textContent = '♫';
     }
+  }
 
-
-    /* =========================================
-       KEYBOARD NAVIGATION
-    ========================================= */
-
-    document.addEventListener(
-        "keydown",
-        (event) => {
-
-            /*
-             * Don't interfere with typing.
-             */
-
-            if (
-                event.target.tagName ===
-                "INPUT" ||
-                event.target.tagName ===
-                "TEXTAREA"
-            ) {
-                return;
-            }
-
-
-            if (
-                event.key === "ArrowRight" ||
-                event.key === "ArrowDown"
-            ) {
-
-                goToPage(
-                    currentPage + 1
-                );
-
-            }
-
-
-            if (
-                event.key === "ArrowLeft" ||
-                event.key === "ArrowUp"
-            ) {
-
-                goToPage(
-                    currentPage - 1
-                );
-
-            }
-
-        }
-    );
-
-
-    /* =========================================
-       GOLD DUST
-    ========================================= */
-
-    const dustContainer =
-        document.getElementById(
-            "dustContainer"
-        );
-
-
-    function createDust() {
-
-        const dust =
-            document.createElement("span");
-
-        dust.className = "dust";
-
-
-        dust.style.left =
-            Math.random() * 100 + "%";
-
-
-        dust.style.top =
-            100 + Math.random() * 10 + "%";
-
-
-        dust.style.animationDuration =
-            8 + Math.random() * 12 + "s";
-
-
-        dust.style.animationDelay =
-            Math.random() * 8 + "s";
-
-
-        const size =
-            1 + Math.random() * 3;
-
-
-        dust.style.width =
-            size + "px";
-
-
-        dust.style.height =
-            size + "px";
-
-
-        dustContainer.appendChild(dust);
-
-
-        setTimeout(() => {
-
-            dust.remove();
-
-        }, 22000);
-
-    }
-
-
-    for (
-        let i = 0;
-        i < 45;
-        i++
-    ) {
-
-        createDust();
-
-    }
-
-
-    setInterval(
-        createDust,
-        450
-    );
-
-
-    /* =========================================
-       INITIAL STATE
-    ========================================= */
-
-    updateNavigation();
-
+  updateMusicButton();
 </script>
 
 </body>
