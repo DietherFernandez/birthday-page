@@ -2,46 +2,45 @@
 @echo off
 setlocal EnableExtensions EnableDelayedExpansion
 
-title GitHub Auto Deploy v2
+title GitHub Auto Deploy - LOCAL WINS
 color 0A
 
 REM ==========================================================
-REM
 REM                 GITHUB DEPLOY CONFIG
-REM
-REM        CHANGE ONLY THESE SETTINGS
-REM
 REM ==========================================================
 
 set "GITHUB_USERNAME=DietherFernandez"
 set "GITHUB_REPOSITORY=birthday-page"
 set "GITHUB_BRANCH=main"
 
-REM ==========================================================
-REM
-REM              DO NOT EDIT BELOW THIS LINE
-REM
-REM ==========================================================
+REM Automatic commit message
+set "COMMIT_MESSAGE=Update project"
 
 set "REMOTE_URL=https://github.com/%GITHUB_USERNAME%/%GITHUB_REPOSITORY%.git"
 
-:START
+REM ==========================================================
+REM                    START DEPLOY
+REM ==========================================================
+
 cls
 
 echo.
 echo ==========================================================
-echo                  GITHUB AUTO DEPLOY v2
+echo             GITHUB AUTO DEPLOY
+echo             LOCAL VERSION WINS
 echo ==========================================================
 echo.
 echo Repository : %GITHUB_USERNAME%/%GITHUB_REPOSITORY%
 echo Branch     : %GITHUB_BRANCH%
+echo.
+echo Starting deployment...
 echo.
 
 REM ==========================================================
 REM CHECK GIT
 REM ==========================================================
 
-echo [1/8] Checking Git...
+echo [1/7] Checking Git...
 
 git --version >nul 2>&1
 
@@ -58,57 +57,37 @@ echo Git detected.
 echo.
 
 REM ==========================================================
-REM CHECK REPOSITORY
+REM INITIALIZE REPOSITORY IF NEEDED
 REM ==========================================================
 
-echo [2/8] Checking local Git repository...
+echo [2/7] Checking local repository...
 
 if not exist ".git" (
 
-    echo.
-    echo No Git repository detected.
-    echo Initializing repository...
-    echo.
+    echo No Git repository found.
+    echo Initializing Git...
 
     git init
 
     if errorlevel 1 (
         color 0C
         echo.
-        echo ERROR: Failed to initialize Git.
+        echo ERROR: Could not initialize Git.
         pause
         exit /b 1
     )
-
-    echo Git repository initialized.
 )
-
-echo.
-
-REM ==========================================================
-REM CONFIGURE BRANCH
-REM ==========================================================
-
-echo Configuring branch...
 
 git branch -M "%GITHUB_BRANCH%"
 
-if errorlevel 1 (
-    color 0C
-    echo.
-    echo ERROR: Could not configure branch.
-    pause
-    exit /b 1
-)
-
-echo Branch: %GITHUB_BRANCH%
+echo Repository ready.
 echo.
 
 REM ==========================================================
 REM CONFIGURE REMOTE
 REM ==========================================================
 
-echo [3/8] Configuring GitHub remote...
+echo [3/7] Configuring GitHub remote...
 
 set "CURRENT_REMOTE="
 
@@ -118,132 +97,68 @@ for /f "delims=" %%R in ('git remote get-url origin 2^>nul') do (
 
 if defined CURRENT_REMOTE (
 
-    echo Existing remote:
-    echo !CURRENT_REMOTE!
-    echo.
-
-    if /I "!CURRENT_REMOTE!"=="%REMOTE_URL%" (
-
-        echo Remote is already correct.
-
-    ) else (
-
+    if /I not "!CURRENT_REMOTE!"=="%REMOTE_URL%" (
         echo Updating GitHub remote...
-
         git remote set-url origin "%REMOTE_URL%"
-
-        if errorlevel 1 (
-            color 0C
-            echo.
-            echo ERROR: Failed to update GitHub remote.
-            pause
-            exit /b 1
-        )
-
-        echo Remote updated.
+    ) else (
+        echo GitHub remote already configured.
     )
 
 ) else (
 
-    echo No origin remote found.
     echo Adding GitHub remote...
-
     git remote add origin "%REMOTE_URL%"
 
-    if errorlevel 1 (
-        color 0C
-        echo.
-        echo ERROR: Failed to add GitHub remote.
-        pause
-        exit /b 1
-    )
-
-    echo GitHub remote added.
 )
 
 echo.
-
-REM ==========================================================
-REM SHOW STATUS
-REM ==========================================================
-
-echo [4/8] Checking project status...
-echo.
-
-git status
-
+echo Remote:
+echo %REMOTE_URL%
 echo.
 
 REM ==========================================================
-REM COMMIT MESSAGE
+REM CANCEL ANY BROKEN OLD MERGE
 REM ==========================================================
 
-echo ==========================================================
-echo                    COMMIT MESSAGE
-echo ==========================================================
-echo.
+if exist ".git\MERGE_HEAD" (
 
-set "COMMIT_MESSAGE="
+    echo Previous merge detected.
+    echo Aborting previous merge...
 
-set /p "COMMIT_MESSAGE=Enter commit message: "
+    git merge --abort >nul 2>&1
 
-if not defined COMMIT_MESSAGE (
-    set "COMMIT_MESSAGE=Update project"
+    echo Previous merge cleared.
+    echo.
 )
 
-echo.
-echo Commit message:
-echo %COMMIT_MESSAGE%
-echo.
-
 REM ==========================================================
-REM ADD FILES
+REM SAVE LOCAL CHANGES FIRST
 REM ==========================================================
 
-echo [5/8] Adding project files...
+echo [4/7] Saving local changes...
 
 git add .
-
-if errorlevel 1 (
-    color 0C
-    echo.
-    echo ERROR: Failed to add files.
-    pause
-    exit /b 1
-)
-
-echo Files added.
-echo.
-
-REM ==========================================================
-REM CREATE COMMIT IF NEEDED
-REM ==========================================================
-
-echo Checking for local changes...
 
 git diff --cached --quiet
 
 if errorlevel 1 (
-
-    echo Changes detected.
-    echo Creating commit...
 
     git commit -m "%COMMIT_MESSAGE%"
 
     if errorlevel 1 (
         color 0C
         echo.
-        echo ERROR: Commit failed.
+        echo ERROR: Could not create local commit.
+        echo.
         pause
         exit /b 1
     )
 
-    echo.
-    echo Commit created successfully.
+    echo Local changes committed.
 
 ) else (
 
-    echo No new local changes detected.
+    echo No new local changes.
 
 )
 
@@ -253,8 +168,7 @@ REM ==========================================================
 REM FETCH GITHUB
 REM ==========================================================
 
-echo [6/8] Checking GitHub for remote changes...
-echo.
+echo [5/7] Checking GitHub...
 
 git fetch origin
 
@@ -262,317 +176,213 @@ if errorlevel 1 (
     color 0C
     echo.
     echo ==========================================================
-    echo                    FETCH FAILED
+    echo                     FETCH FAILED
     echo ==========================================================
     echo.
     echo Could not connect to GitHub.
-    echo.
-    echo Check:
-    echo - Internet connection
-    echo - Repository name
-    echo - GitHub authentication
-    echo - Repository permissions
+    echo Check your internet connection and GitHub login.
     echo.
     pause
     exit /b 1
 )
 
-echo GitHub synchronization check completed.
+echo GitHub changes downloaded.
 echo.
 
 REM ==========================================================
-REM CHECK WHETHER REMOTE BRANCH EXISTS
+REM CHECK IF REMOTE BRANCH EXISTS
 REM ==========================================================
 
 git show-ref --verify --quiet "refs/remotes/origin/%GITHUB_BRANCH%"
 
 if errorlevel 1 (
 
-    echo.
     echo GitHub branch does not exist yet.
-    echo The local branch will be uploaded.
+    echo Preparing first upload...
     echo.
-
     goto PUSH
 
 )
 
 REM ==========================================================
-REM CHECK LOCAL / REMOTE DIFFERENCES
+REM CHECK WHETHER LOCAL AND REMOTE ARE DIFFERENT
 REM ==========================================================
 
-for /f %%A in ('git rev-list --count "origin/%GITHUB_BRANCH%..HEAD" 2^>nul') do set "LOCAL_AHEAD=%%A"
+set "LOCAL_AHEAD=0"
+set "REMOTE_AHEAD=0"
 
-for /f %%A in ('git rev-list --count "HEAD..origin/%GITHUB_BRANCH%" 2^>nul') do set "REMOTE_AHEAD=%%A"
+for /f %%A in ('git rev-list --count "origin/%GITHUB_BRANCH%..HEAD" 2^>nul') do (
+    set "LOCAL_AHEAD=%%A"
+)
 
-if not defined LOCAL_AHEAD set "LOCAL_AHEAD=0"
-if not defined REMOTE_AHEAD set "REMOTE_AHEAD=0"
+for /f %%A in ('git rev-list --count "HEAD..origin/%GITHUB_BRANCH%" 2^>nul') do (
+    set "REMOTE_AHEAD=%%A"
+)
 
 echo ==========================================================
-echo                  SYNC INFORMATION
+echo                    SYNC STATUS
 echo ==========================================================
 echo.
-echo Local commits ahead  : %LOCAL_AHEAD%
-echo GitHub commits ahead : %REMOTE_AHEAD%
+echo Local commits ahead  : !LOCAL_AHEAD!
+echo GitHub commits ahead : !REMOTE_AHEAD!
 echo.
 
 REM ==========================================================
-REM NOTHING TO PUSH
+REM ALREADY SYNCHRONIZED
 REM ==========================================================
 
-if "%LOCAL_AHEAD%"=="0" if "%REMOTE_AHEAD%"=="0" (
+if "!LOCAL_AHEAD!"=="0" if "!REMOTE_AHEAD!"=="0" (
 
     echo Local project and GitHub are already synchronized.
-    echo.
     goto SUCCESS
 
 )
 
 REM ==========================================================
-REM LOCAL ONLY
+REM ONLY LOCAL CHANGES
 REM ==========================================================
 
-if "%REMOTE_AHEAD%"=="0" (
+if "!REMOTE_AHEAD!"=="0" (
 
-    echo Local project contains new commits.
-    echo Ready to upload.
-    echo.
-
+    echo Only local changes detected.
     goto PUSH
 
 )
 
 REM ==========================================================
-REM REMOTE ONLY
+REM ONLY REMOTE CHANGES
+REM
+REM IMPORTANT:
+REM LOCAL PROJECT IS ALWAYS THE SOURCE OF TRUTH.
+REM We merge remote, then keep local files for conflicts.
 REM ==========================================================
 
-if "%LOCAL_AHEAD%"=="0" (
+if "!LOCAL_AHEAD!"=="0" (
 
-    echo GitHub contains commits that are not local.
+    echo GitHub contains changes not present locally.
     echo.
-    goto REMOTE_ONLY
+    echo Synchronizing while keeping LOCAL files...
+    goto MERGE_LOCAL
 
 )
 
 REM ==========================================================
-REM BOTH SIDES HAVE CHANGES
+REM BOTH LOCAL AND REMOTE HAVE CHANGES
 REM ==========================================================
 
 echo Both local and GitHub contain changes.
-echo A merge may be required.
+echo.
+echo Automatically keeping LOCAL files.
 echo.
 
-goto CONFLICT_MENU
-
-REM ==========================================================
-REM REMOTE ONLY MENU
-REM ==========================================================
-
-:REMOTE_ONLY
+:MERGE_LOCAL
 
 echo ==========================================================
-echo               GITHUB HAS NEWER CHANGES
-echo ==========================================================
-echo.
-echo Choose an action:
-echo.
-echo [L] Keep LOCAL version
-echo [R] Keep REMOTE/GitHub version
-echo [C] Cancel
-echo.
-
-set "CHOICE="
-set /p "CHOICE=Choice: "
-
-if /I "%CHOICE%"=="L" goto KEEP_LOCAL
-if /I "%CHOICE%"=="R" goto KEEP_REMOTE
-if /I "%CHOICE%"=="C" goto CANCEL
-
-echo.
-echo Invalid choice.
-echo Please enter L, R, or C.
-echo.
-pause
-goto REMOTE_ONLY
-
-REM ==========================================================
-REM CONFLICT MENU
-REM ==========================================================
-
-:CONFLICT_MENU
-
-echo ==========================================================
-echo                    SYNC CONFLICT
-echo ==========================================================
-echo.
-echo Your local project and GitHub both contain changes.
-echo.
-echo Choose how to resolve the conflict:
-echo.
-echo [L] Keep LOCAL files
-echo [R] Keep REMOTE/GitHub files
-echo [C] Cancel
-echo.
-
-set "CHOICE="
-set /p "CHOICE=Choice: "
-
-if /I "%CHOICE%"=="L" goto KEEP_LOCAL
-if /I "%CHOICE%"=="R" goto KEEP_REMOTE
-if /I "%CHOICE%"=="C" goto CANCEL
-
-echo.
-echo Invalid choice.
-echo Please enter L, R, or C.
-echo.
-pause
-goto CONFLICT_MENU
-
-REM ==========================================================
-REM KEEP LOCAL
-REM ==========================================================
-
-:KEEP_LOCAL
-
-echo.
-echo ==========================================================
-echo                  KEEPING LOCAL VERSION
+echo             MERGING GITHUB CHANGES
+echo             LOCAL FILES HAVE PRIORITY
 echo ==========================================================
 echo.
 
-REM If histories are unrelated, merge first.
+REM Merge GitHub into local branch.
+REM Conflicts are expected and will be automatically resolved.
+
 git merge "origin/%GITHUB_BRANCH%" --allow-unrelated-histories --no-edit
 
 if not errorlevel 1 (
+
     echo.
     echo Merge completed without conflicts.
     goto PUSH
+
 )
 
+REM ==========================================================
+REM AUTOMATICALLY RESOLVE ALL CONFLICTS USING LOCAL
+REM ==========================================================
+
 echo.
-echo Conflicts detected.
+echo Merge conflicts detected.
+echo.
+echo Automatically keeping LOCAL versions...
 echo.
 
-REM Get conflicted files
-git diff --name-only --diff-filter=U > "%TEMP%\github_conflicts.txt"
+git diff --name-only --diff-filter=U > "%TEMP%\birthday_conflicts.txt"
 
-if not exist "%TEMP%\github_conflicts.txt" (
+if not exist "%TEMP%\birthday_conflicts.txt" (
     color 0C
+    echo.
     echo ERROR: Could not identify conflicted files.
+    echo.
+    git status
     pause
     exit /b 1
 )
 
-echo Conflicted files:
-echo.
+for /f "delims=" %%F in (%TEMP%\birthday_conflicts.txt) do (
 
-type "%TEMP%\github_conflicts.txt"
+    echo Keeping LOCAL:
+    echo %%F
 
-echo.
-echo Replacing conflicted files with LOCAL versions...
-echo.
-
-for /f "delims=" %%F in (%TEMP%\github_conflicts.txt) do (
-    echo Keeping LOCAL: %%F
     git checkout --ours -- "%%F"
+
+    if errorlevel 1 (
+        color 0C
+        echo.
+        echo ERROR resolving:
+        echo %%F
+        pause
+        exit /b 1
+    )
+
     git add -- "%%F"
 )
 
-del "%TEMP%\github_conflicts.txt" >nul 2>&1
+del "%TEMP%\birthday_conflicts.txt" >nul 2>&1
 
 echo.
-echo Local versions selected.
-echo Creating merge commit...
+echo All conflicts resolved using LOCAL files.
+echo.
+
+REM ==========================================================
+REM CHECK FOR REMAINING CONFLICTS
+REM ==========================================================
+
+git diff --name-only --diff-filter=U | findstr . >nul
+
+if not errorlevel 1 (
+
+    color 0C
+    echo.
+    echo ERROR: Some conflicts are still unresolved.
+    echo.
+    git status
+    pause
+    exit /b 1
+
+)
+
+REM ==========================================================
+REM COMPLETE MERGE
+REM ==========================================================
+
+echo Completing merge...
 
 git commit -m "Merge GitHub changes - keep local version"
 
 if errorlevel 1 (
+
     color 0C
     echo.
-    echo ERROR: Could not create merge commit.
+    echo ERROR: Could not complete merge.
     echo.
     git status
     pause
     exit /b 1
+
 )
 
+echo Merge completed.
 echo.
-echo Merge resolved using LOCAL files.
-echo.
-
-goto PUSH
-
-REM ==========================================================
-REM KEEP REMOTE
-REM ==========================================================
-
-:KEEP_REMOTE
-
-echo.
-echo ==========================================================
-echo                 KEEPING REMOTE VERSION
-echo ==========================================================
-echo.
-
-git merge "origin/%GITHUB_BRANCH%" --allow-unrelated-histories --no-edit
-
-if not errorlevel 1 (
-    echo.
-    echo Merge completed without conflicts.
-    goto PUSH
-)
-
-echo.
-echo Conflicts detected.
-echo.
-
-git diff --name-only --diff-filter=U > "%TEMP%\github_conflicts.txt"
-
-if not exist "%TEMP%\github_conflicts.txt" (
-    color 0C
-    echo ERROR: Could not identify conflicted files.
-    pause
-    exit /b 1
-)
-
-echo Conflicted files:
-echo.
-
-type "%TEMP%\github_conflicts.txt"
-
-echo.
-echo Replacing conflicted files with REMOTE versions...
-echo.
-
-for /f "delims=" %%F in (%TEMP%\github_conflicts.txt) do (
-    echo Keeping REMOTE: %%F
-    git checkout --theirs -- "%%F"
-    git add -- "%%F"
-)
-
-del "%TEMP%\github_conflicts.txt" >nul 2>&1
-
-echo.
-echo Remote versions selected.
-echo Creating merge commit...
-
-git commit -m "Merge GitHub changes - keep remote version"
-
-if errorlevel 1 (
-    color 0C
-    echo.
-    echo ERROR: Could not create merge commit.
-    echo.
-    git status
-    pause
-    exit /b 1
-)
-
-echo.
-echo Merge resolved using REMOTE files.
-echo.
-
-goto PUSH
 
 REM ==========================================================
 REM PUSH
@@ -580,7 +390,7 @@ REM ==========================================================
 
 :PUSH
 
-echo [7/8] Uploading project to GitHub...
+echo [6/7] Uploading project to GitHub...
 echo.
 
 git push -u origin "%GITHUB_BRANCH%"
@@ -591,36 +401,20 @@ if errorlevel 1 (
 
     echo.
     echo ==========================================================
-    echo                    PUSH FAILED
+    echo                     PUSH FAILED
     echo ==========================================================
     echo.
-    echo GitHub rejected the push.
+    echo GitHub rejected the upload.
     echo.
-    echo Running one final synchronization check...
+    echo Your local files were NOT force-pushed.
     echo.
-
-    git fetch origin
-
-    if errorlevel 1 (
-        echo.
-        echo Could not fetch GitHub.
-        pause
-        exit /b 1
-    )
-
-    echo.
-    echo Please run:
-    echo.
-    echo     git status
-    echo.
-    echo and inspect the result.
+    echo Run deploy.bat again after checking the error above.
     echo.
 
     pause
     exit /b 1
-)
 
-goto SUCCESS
+)
 
 REM ==========================================================
 REM SUCCESS
@@ -628,14 +422,16 @@ REM ==========================================================
 
 :SUCCESS
 
+echo [7/7] Deployment finished.
+
 color 0A
 
 echo.
-echo [8/8] DEPLOY COMPLETE
+echo ==========================================================
+echo                 DEPLOYMENT COMPLETE
+echo ==========================================================
 echo.
-echo ==========================================================
-echo                    DEPLOY SUCCESSFUL
-echo ==========================================================
+echo Your LOCAL project is now uploaded to GitHub.
 echo.
 echo Repository:
 echo https://github.com/%GITHUB_USERNAME%/%GITHUB_REPOSITORY%
@@ -643,31 +439,12 @@ echo.
 echo Branch:
 echo %GITHUB_BRANCH%
 echo.
-echo Your project is synchronized with GitHub.
+echo Commit:
+echo %COMMIT_MESSAGE%
 echo.
 echo ==========================================================
 echo.
-
-pause
-exit /b 0
-
-REM ==========================================================
-REM CANCEL
-REM ==========================================================
-
-:CANCEL
-
-color 0E
-
-echo.
-echo ==========================================================
-echo                    DEPLOY CANCELLED
-echo ==========================================================
-echo.
-echo No files were force-pushed.
-echo Your repository has been left untouched.
-echo.
-echo ==========================================================
+echo You can close this window.
 echo.
 
 pause
