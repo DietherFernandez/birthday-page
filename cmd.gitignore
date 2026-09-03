@@ -1,6 +1,0 @@
-# Ignore junk files so they never block your commit
-Try.html
-git-init.bat
-*.log
-.DS_Store
-Thumbs.db
