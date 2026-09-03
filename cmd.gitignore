@@ -1,0 +1,6 @@
+# Ignore junk files that keep popping up
+Try.html
+git-init.bat
+*.log
+.DS_Store
+Thumbs.db
