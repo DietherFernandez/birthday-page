@@ -1,6 +1,3 @@
-@echo off
-git init
 git add .
-git commit -m "first commit"
-echo Git initialization complete!
-pause
+git commit -m "Add birthday page and photos"
+git push -u origin main
