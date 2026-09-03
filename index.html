@@ -883,20 +883,33 @@
   const bgMusic = document.getElementById('bgMusic');
   const musicToggle = document.getElementById('musicToggle');
   let isMusicPlaying = false;
+  let isTransitioning = false;
 
   musicToggle.addEventListener('click', async () => {
+    if(isTransitioning) return;
+    isTransitioning = true;
+
     try {
       if(isMusicPlaying){
         bgMusic.pause();
         isMusicPlaying = false;
       } else {
         bgMusic.muted = false;
-        await bgMusic.play();
-        isMusicPlaying = true;
+        const playPromise = bgMusic.play();
+        if(playPromise !== undefined){
+          playPromise.then(() => {
+            isMusicPlaying = true;
+          }).catch(err => {
+            console.log('Play error:', err.name, err.message);
+            isMusicPlaying = false;
+          });
+        }
       }
       updateMusicButton();
     } catch(err){
       console.log('Audio control error:', err);
+    } finally {
+      setTimeout(() => { isTransitioning = false; }, 100);
     }
   });
 
