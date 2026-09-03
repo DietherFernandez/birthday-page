@@ -12,7 +12,7 @@ if exist .gitignore (
 git add .
 
 :: 3. Commit changes (silently handles "nothing to commit")
-git commit -m "Auto-update birthday page"
+git commit -m "birthday"
 
 :: 4. Push to main
 git push origin main
