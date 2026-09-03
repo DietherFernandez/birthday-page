@@ -637,7 +637,7 @@
 <div class="curtain" id="curtain"><span>opening something for you...</span></div>
 <div id="pageAnnounce" class="visually-hidden" aria-live="polite"></div>
 
-<audio id="bgMusic" autoplay muted loop preload="metadata" crossorigin="anonymous">
+<audio id="bgMusic" muted loop preload="metadata" crossorigin="anonymous">
   <source src="https://p.scdn.co/mp3-preview/5c30c691b7ce34b37c7e1fdf40b60c2942145c35?cid=774b29d4f13844c2898b85b071c0cb4d" type="audio/mpeg">
 </audio>
 
@@ -686,19 +686,19 @@
     <p class="memories-sub">Replace these four with real photos of you two — instructions are in the code comments.</p>
     <div class="memories-grid">
       <div class="polaroid">
-        <div class="photo-slot">photo 1</div>
+        <img src="photo1.jpg" style="width:100%;height:100%;object-fit:cover;">
         <span class="polaroid-caption">the first one</span>
       </div>
       <div class="polaroid">
-        <div class="photo-slot">photo 2</div>
+        <img src="photo2.jpg" style="width:100%;height:100%;object-fit:cover;">
         <span class="polaroid-caption">that trip</span>
       </div>
       <div class="polaroid">
-        <div class="photo-slot">photo 3</div>
+        <img src="photo3.jpg" style="width:100%;height:100%;object-fit:cover;">
         <span class="polaroid-caption">just because</span>
       </div>
       <div class="polaroid">
-        <div class="photo-slot">photo 4</div>
+        <img src="photo4.jpeg" style="width:100%;height:100%;object-fit:cover;">
         <span class="polaroid-caption">us, lately</span>
       </div>
     </div>
@@ -884,31 +884,43 @@
   const musicToggle = document.getElementById('musicToggle');
   let isMusicPlaying = false;
 
-  musicToggle.addEventListener('click', () => {
-    if(isMusicPlaying){
-      bgMusic.pause();
-      musicToggle.style.opacity = '0.5';
-      musicToggle.textContent = '♫';
-    } else {
-      bgMusic.muted = false;
-      bgMusic.play().catch(err => console.log('Audio play failed:', err));
-      musicToggle.style.opacity = '1';
-      musicToggle.textContent = '♪';
+  musicToggle.addEventListener('click', async () => {
+    try {
+      if(isMusicPlaying){
+        bgMusic.pause();
+        isMusicPlaying = false;
+      } else {
+        bgMusic.muted = false;
+        await bgMusic.play();
+        isMusicPlaying = true;
+      }
+      updateMusicButton();
+    } catch(err){
+      console.log('Audio control error:', err);
     }
-    isMusicPlaying = !isMusicPlaying;
   });
 
   bgMusic.addEventListener('play', () => {
     isMusicPlaying = true;
-    musicToggle.style.opacity = '1';
-    musicToggle.textContent = '♪';
+    updateMusicButton();
   });
 
   bgMusic.addEventListener('pause', () => {
     isMusicPlaying = false;
-    musicToggle.style.opacity = '0.5';
-    musicToggle.textContent = '♫';
+    updateMusicButton();
   });
+
+  function updateMusicButton(){
+    if(isMusicPlaying){
+      musicToggle.style.opacity = '1';
+      musicToggle.textContent = '♪';
+    } else {
+      musicToggle.style.opacity = '0.5';
+      musicToggle.textContent = '♫';
+    }
+  }
+
+  updateMusicButton();
 </script>
 
 </body>
