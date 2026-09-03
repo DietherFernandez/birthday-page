@@ -1,4 +1,4 @@
-# Ignore junk files that keep popping up
+# Ignore junk files so they never block your commit
 Try.html
 git-init.bat
 *.log

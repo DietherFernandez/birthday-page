@@ -1,21 +1,21 @@
 @echo off
-echo 🚀 Auto-committing to GitHub...
-
+echo 🚀 One‑click deploy to GitHub...
 cd /d "%~dp0"
 
-:: 1. If .gitignore exists, add it to stop tracking those junk files
+:: Add the ignore file (only needed the first time)
 if exist .gitignore (
     git add .gitignore
 )
 
-:: 2. Add all valid files (respects .gitignore, so Try.html won't be added)
-git add .
+:: Add your birthday page and all photos
+git add index.html
+git add *.jpg *.jpeg *.png *.gif *.webp
 
-:: 3. Commit changes (silently handles "nothing to commit")
-git commit -m "birthday"
+:: Commit everything
+git commit -m "Update birthday page 🎂"
 
-:: 4. Push to main
+:: Push to your repo
 git push origin main
 
-echo ✅ All done!
+echo ✅ Done! Live at: https://dietherfernandez.github.io/birthday/
 pause
