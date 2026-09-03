@@ -603,6 +603,32 @@
 
   a, button{ font-family:inherit; }
 
+  .music-toggle{
+    position:fixed;
+    top:20px;
+    right:20px;
+    width:50px;
+    height:50px;
+    border-radius:50%;
+    background: rgba(201,161,90,0.15);
+    border: 1.5px solid var(--gold-soft);
+    color: var(--gold-soft);
+    font-size:1.2rem;
+    cursor:pointer;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    transition: background 0.3s ease, transform 0.2s ease;
+    z-index:100;
+  }
+
+  .music-toggle:hover{
+    background: rgba(201,161,90,0.25);
+    transform: scale(1.08);
+  }
+
+  .music-toggle:active{ transform: scale(0.96); }
+
   ::selection{ background: var(--gold-soft); color: var(--wine-deep); }
 </style>
 </head>
@@ -610,6 +636,12 @@
 
 <div class="curtain" id="curtain"><span>opening something for you...</span></div>
 <div id="pageAnnounce" class="visually-hidden" aria-live="polite"></div>
+
+<audio id="bgMusic" autoplay muted loop preload="metadata" crossorigin="anonymous">
+  <source src="https://p.scdn.co/mp3-preview/5c30c691b7ce34b37c7e1fdf40b60c2942145c35?cid=774b29d4f13844c2898b85b071c0cb4d" type="audio/mpeg">
+</audio>
+
+<button class="music-toggle" id="musicToggle" title="Toggle music" aria-label="Toggle background music">♫</button>
 
 <div class="pager" id="pager">
 
@@ -846,6 +878,37 @@
       if(closingPage.classList.contains('active')) spawnHeart(true);
     }, 3200);
   }
+
+  // Music control
+  const bgMusic = document.getElementById('bgMusic');
+  const musicToggle = document.getElementById('musicToggle');
+  let isMusicPlaying = false;
+
+  musicToggle.addEventListener('click', () => {
+    if(isMusicPlaying){
+      bgMusic.pause();
+      musicToggle.style.opacity = '0.5';
+      musicToggle.textContent = '♫';
+    } else {
+      bgMusic.muted = false;
+      bgMusic.play().catch(err => console.log('Audio play failed:', err));
+      musicToggle.style.opacity = '1';
+      musicToggle.textContent = '♪';
+    }
+    isMusicPlaying = !isMusicPlaying;
+  });
+
+  bgMusic.addEventListener('play', () => {
+    isMusicPlaying = true;
+    musicToggle.style.opacity = '1';
+    musicToggle.textContent = '♪';
+  });
+
+  bgMusic.addEventListener('pause', () => {
+    isMusicPlaying = false;
+    musicToggle.style.opacity = '0.5';
+    musicToggle.textContent = '♫';
+  });
 </script>
 
 </body>
