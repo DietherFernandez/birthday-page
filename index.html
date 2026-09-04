@@ -148,9 +148,9 @@
     border:1px solid rgba(0,0,0,0.18);
     color: inherit;
     font-family:'Jost', sans-serif;
-    font-size:0.85rem;
+    font-size:clamp(0.75rem, 2vw, 0.85rem);
     letter-spacing:0.03em;
-    padding:0.85rem 1.9rem;
+    padding:0.85rem clamp(1.5rem, 5vw, 1.9rem);
     border-radius:999px;
     cursor:pointer;
     display:inline-flex;
@@ -355,10 +355,10 @@
   .envelope-wrap.open ~ .hero-hint{ animation: none; opacity:0; }
 
   /* ---------- LETTER PAGE ---------- */
-  .letter-card{ max-width:620px; width:100%; }
+  .letter-card{ max-width:620px; width:100%; padding:2rem 1.5rem; }
 
   .letter-mark{
-    width:34px; height:2px;
+    width:clamp(20px, 5vw, 34px); height:2px;
     background: var(--gold);
     margin-bottom:2rem;
     transform-origin:left;
@@ -384,7 +384,7 @@
 
   .letter-body p{
     font-family:'Cormorant Garamond', serif;
-    font-size:1.3rem;
+    font-size:clamp(1rem, 2.5vw, 1.3rem);
     line-height:1.7;
     margin-bottom:1.3rem;
     color:#3A2028;
@@ -410,7 +410,7 @@
     font-family:'Cormorant Garamond', serif;
     font-weight:600;
     font-style:normal;
-    font-size:3.2rem;
+    font-size:clamp(2rem, 5vw, 3.2rem);
     line-height:0.7;
     float:left;
     padding-right:0.12em;
@@ -422,12 +422,23 @@
     margin-top:1.6rem;
     font-family:'Cormorant Garamond', serif;
     font-style:italic;
-    font-size:1.5rem;
+    font-size:clamp(1rem, 2.5vw, 1.5rem);
     color: var(--wine);
     text-align:left;
   }
 
-  /* ---------- MEMORIES PAGE ---------- */
+  /* Responsive adjustments for small screens */
+@media (max-width: 480px) {
+  .letter-card {
+    padding: 1.5rem;
+  }
+  .letter-body p {
+    font-size: clamp(0.875rem, 3vw, 1.1rem);
+  }
+  .letter-signoff {
+    font-size: clamp(0.875rem, 3vw, 1.2rem);
+  }
+}
   .memories-heading{
     font-family:'Cormorant Garamond', serif;
     font-style:italic;
@@ -733,9 +744,10 @@
       <div class="letter-mark"></div>
       <h1 class="letter-heading">Happy Birthday B!.</h1>
       <div class="letter-body">
-        <p>I wanted today to start with something just for you, before the calls and the cake and everyone else gets their turn to make a fuss. This one's from me first.</p>
-        <p>Edit this paragraph with something only the two of you would know — the way you two met, an inside joke, a specific morning you keep thinking about. The more specific it is, the more it'll feel like you wrote it, not a template.</p>
-        <p>Whatever this year brings, I want to be next to you for it — the ordinary Tuesdays and the big ones alike.</p>
+        <p>This is your first birthday na malayo ako sa’yo. Sana kahit hindi ako nandiyan sa tabi mo, maramdaman mo pa rin kung gaano kita kamahal at kung gaano ako ka-proud sa’yo.Mag-ingat ka diyan palagi, okay? Bawal sumuko. HAHAHA. Laban lang, tiwala lang. Alam kong hindi madali ang lahat ng pinagdadaanan mo diyan, pero alam ko rin kung gaano ka katatag.
+        <p>At kapag dumating yung mga araw na nanghihina ka, pagod ka, o parang gusto mo nang sumuko, isipin mo kung bakit ka nagpunta diyan. Isipin mo yung mga hirap, pagod, gutom, puyat, at gastos na tiniis mo para makarating ka kung nasaan ka ngayon.Hindi lahat ng sakripisyo madaling makita ang resulta agad. Kaya kapit lang. Unti-unti, makakamit mo rin yung pinapangarap mo.
+        <p>Nandito lang ako palagi para sa’yo. Kahit malayo, susuportahan at paniniwalaan kita.Laban lang, baby. Kaya mo ’yan. ❤️<p>
+        <p>Happy Birthday, and please take care of yourself always. I love you. ❤️<p>
       </div>
       <p class="letter-signoff">— always yours</p>
       <button class="continue-btn next-btn">a few of my favorites <span class="arrow">→</span></button>
